@@ -22,10 +22,10 @@ export default function GalleryPage() {
   const [success, setSuccess] = useState(false)
 
   const members = [
-    { name: '심희정 (엄마)' },
-    { name: '김동일 (아빠)' },
-    { name: '김태환 (큰아들)' },
-    { name: '김민환 (작은아들)' }
+    { name: '심희정', label: '심희정 (엄마)' },
+    { name: '김동일', label: '김동일 (아빠)' },
+    { name: '김태환', label: '김태환 (큰아들)' },
+    { name: '김민환', label: '김민환 (작은아들)' }
   ]
 
   const [uploadForm, setUploadForm] = useState({
@@ -237,7 +237,7 @@ export default function GalleryPage() {
                     <option value="">선택해주세요</option>
                     {members.map((member, idx) => (
                       <option key={idx} value={member.name}>
-                        {member.name}
+                        {member.label}
                       </option>
                     ))}
                   </select>
