@@ -102,14 +102,15 @@ export default function GalleryPage() {
 
     try {
       // 멤버 ID를 UUID로 변환
-      const { data: memberData } = await supabase
+      const { data: memberData, error: memberError } = await supabase
         .from('members')
         .select('id')
-        .eq('role', uploadForm.member_id)
+        .eq('role', uploadForm.member_id.trim())
         .single()
 
-      if (!memberData) {
-        setError('멤버 정보를 찾을 수 없습니다')
+      if (memberError || !memberData) {
+        console.error('Member lookup error:', memberError)
+        setError('멤버 정보를 찾을 수 없습니다. 다시 선택해주세요.')
         return
       }
 
@@ -118,9 +119,9 @@ export default function GalleryPage() {
         .insert([
           {
             uploaded_by: memberData.id,
-            title: uploadForm.title,
-            description: uploadForm.description,
-            image_url: uploadForm.image_url
+            title: uploadForm.title.trim(),
+            description: uploadForm.description.trim(),
+            image_url: uploadForm.image_url.trim()
           }
         ])
 
