@@ -16,61 +16,19 @@ interface Photo {
   }[]
 }
 
-interface UploadFormData {
-  member_id: string
-  title: string
-  description: string
-  image_url: string
-}
-
 export default function GalleryPage() {
   const [photos, setPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(true)
-  const [showUploadForm, setShowUploadForm] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
-  const [members, setMembers] = useState<any[]>([])
-
-  const [uploadForm, setUploadForm] = useState<UploadFormData>({
-    member_id: '',
-    title: '',
-    description: '',
-    image_url: ''
-  })
 
   useEffect(() => {
     fetchPhotos()
-    fetchMembers()
   }, [])
-
-  const fetchMembers = async () => {
-    try {
-      const { data } = await supabase
-        .from('members')
-        .select('id, name, role')
-        .order('created_at', { ascending: true })
-
-      if (data) {
-        setMembers(data)
-      }
-    } catch (error) {
-      console.error('멤버 로드 실패:', error)
-    }
-  }
 
   const fetchPhotos = async () => {
     try {
       const { data, error } = await supabase
         .from('photos')
-        .select(`
-          id,
-          title,
-          description,
-          image_url,
-          created_at,
-          members:uploaded_by(name, role)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -79,85 +37,6 @@ export default function GalleryPage() {
       console.error('갤러리 로드 실패:', error)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleUploadChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setUploadForm(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
-
-  const handleUploadSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setSuccess(false)
-
-    if (!uploadForm.member_id) {
-      setError('멤버를 선택해주세요')
-      return
-    }
-    if (!uploadForm.title.trim()) {
-      setError('사진 제목을 입력해주세요')
-      return
-    }
-    if (!uploadForm.image_url.trim()) {
-      setError('이미지 URL을 입력해주세요')
-      return
-    }
-
-    setUploading(true)
-
-    try {
-      const { error: insertError } = await supabase
-        .from('photos')
-        .insert([
-          {
-            uploaded_by: uploadForm.member_id,
-            title: uploadForm.title.trim(),
-            description: uploadForm.description.trim(),
-            image_url: uploadForm.image_url.trim()
-          }
-        ])
-
-      if (insertError) throw insertError
-
-      setSuccess(true)
-      setUploadForm({
-        member_id: '',
-        title: '',
-        description: '',
-        image_url: ''
-      })
-      setShowUploadForm(false)
-
-      // 새로운 사진 로드
-      setTimeout(() => {
-        fetchPhotos()
-      }, 500)
-    } catch (err: any) {
-      setError(err.message || '업로드 중 오류가 발생했습니다')
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  const deletePhoto = async (photoId: string) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return
-
-    try {
-      const { error } = await supabase
-        .from('photos')
-        .delete()
-        .eq('id', photoId)
-
-      if (error) throw error
-      setPhotos(photos.filter(photo => photo.id !== photoId))
-    } catch (error) {
-      console.error('삭제 실패:', error)
-      alert('삭제 중 오류가 발생했습니다')
     }
   }
 
@@ -217,161 +96,45 @@ export default function GalleryPage() {
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h1 className="text-5xl font-bold mb-2">📸 갤러리</h1>
-            <p className="text-xl text-gray-600">
-              우리 가족의 소중한 순간들을 담았습니다
-            </p>
-          </div>
-          <button
-            onClick={() => setShowUploadForm(!showUploadForm)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold whitespace-nowrap"
-          >
-            {showUploadForm ? '❌ 닫기' : '⬆️ 사진 업로드'}
-          </button>
-        </div>
-
-        {/* 업로드 폼 */}
-        {showUploadForm && (
-          <div className="bg-blue-50 rounded-lg shadow-md p-8 mb-12">
-            <h2 className="text-2xl font-bold mb-6">사진 업로드</h2>
-
-            {error && (
-              <div className="mb-6 p-4 bg-red-100 border-2 border-red-300 rounded-lg text-red-800">
-                {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="mb-6 p-4 bg-green-100 border-2 border-green-300 rounded-lg text-green-800">
-                ✅ 사진이 업로드되었습니다!
-              </div>
-            )}
-
-            <form onSubmit={handleUploadSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="block font-semibold mb-2">멤버 선택</label>
-                  <select
-                    name="member_id"
-                    value={uploadForm.member_id}
-                    onChange={handleUploadChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="">선택해주세요</option>
-                    {members.map(member => (
-                      <option key={member.id} value={member.id}>
-                        {member.name} ({member.role})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-semibold mb-2">사진 제목</label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={uploadForm.title}
-                    onChange={handleUploadChange}
-                    placeholder="예: 가족 여행"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <label className="block font-semibold mb-2">이미지 URL</label>
-                <input
-                  type="url"
-                  name="image_url"
-                  value={uploadForm.image_url}
-                  onChange={handleUploadChange}
-                  placeholder="https://example.com/image.jpg"
-                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                />
-                <p className="text-sm text-gray-600 mt-2">
-                  💡 구글 포토에서 이미지를 복사한 후, 우클릭 → 이미지 주소 복사로 URL을 얻을 수 있습니다.
-                </p>
-              </div>
-
-              <div className="mb-6">
-                <label className="block font-semibold mb-2">설명</label>
-                <textarea
-                  name="description"
-                  value={uploadForm.description}
-                  onChange={handleUploadChange}
-                  placeholder="사진에 대한 설명 (선택사항)"
-                  rows={3}
-                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div className="flex gap-4">
-                <button
-                  type="submit"
-                  disabled={uploading}
-                  className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50"
-                >
-                  {uploading ? '업로드 중...' : '📤 업로드'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowUploadForm(false)}
-                  className="flex-1 bg-gray-400 text-white px-6 py-3 rounded-lg hover:bg-gray-500 transition font-semibold"
-                >
-                  취소
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
+        <h1 className="text-5xl font-bold mb-4 text-center">📸 갤러리</h1>
+        <p className="text-xl text-gray-600 text-center mb-12">
+          우리 가족의 소중한 순간들을 담았습니다
+        </p>
 
         {loading ? (
           <div className="text-center py-12">
             <p className="text-lg text-gray-600">로딩 중...</p>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {displayPhotos.map((photo) => (
-                <div
-                  key={photo.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition group"
-                >
-                  <div className="relative w-full h-64 overflow-hidden bg-gray-200">
-                    <img
-                      src={photo.image_url}
-                      alt={photo.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
-                      onError={(e) => {
-                        const img = e.target as HTMLImageElement
-                        img.src = 'https://via.placeholder.com/500x500?text=사진'
-                      }}
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-bold mb-2">{photo.title}</h3>
-                    <p className="text-gray-600 text-sm mb-3">{photo.description}</p>
-                    <div className="flex justify-between items-center">
-                      {photo.members && photo.members[0] && (
-                        <div className="text-xs text-gray-500">
-                          <span>📌 {photo.members[0].name}</span>
-                        </div>
-                      )}
-                      <button
-                        onClick={() => deletePhoto(photo.id)}
-                        className="text-xs bg-red-100 text-red-800 px-3 py-1 rounded hover:bg-red-200 transition"
-                      >
-                        🗑️ 삭제
-                      </button>
-                    </div>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {displayPhotos.map((photo) => (
+              <div
+                key={photo.id}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition group"
+              >
+                <div className="relative w-full h-64 overflow-hidden bg-gray-200">
+                  <img
+                    src={photo.image_url}
+                    alt={photo.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement
+                      img.src = 'https://via.placeholder.com/500x500?text=사진'
+                    }}
+                  />
                 </div>
-              ))}
-            </div>
-          </>
+                <div className="p-4">
+                  <h3 className="text-lg font-bold mb-2">{photo.title}</h3>
+                  <p className="text-gray-600 text-sm mb-3">{photo.description}</p>
+                  {photo.members && photo.members[0] && (
+                    <div className="text-xs text-gray-500">
+                      <span>📌 {photo.members[0].name}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         )}
 
         <div className="mt-16 text-center">
