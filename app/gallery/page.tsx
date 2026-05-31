@@ -27,7 +27,7 @@ export default function GalleryPage() {
     member_name: '',
     title: '',
     description: '',
-    image_file: null as File | null
+    image_url: ''
   })
 
   useEffect(() => {
@@ -56,42 +56,26 @@ export default function GalleryPage() {
     setError('')
     setSuccess(false)
 
-    if (!form.member_name || !form.title.trim() || !form.image_file) {
+    if (!form.member_name || !form.title.trim() || !form.image_url.trim()) {
       setError('모든 필드를 입력해주세요')
       return
     }
 
     setUploading(true)
     try {
-      const file = form.image_file
-      const fileName = `${Date.now()}_${file.name}`
-
-      // Supabase Storage에 파일 업로드
-      const { data: uploadData, error: uploadErr } = await supabase.storage
-        .from('photos')
-        .upload(fileName, file)
-
-      if (uploadErr) throw uploadErr
-
-      // 공개 URL 가져오기
-      const { data: { publicUrl } } = supabase.storage
-        .from('photos')
-        .getPublicUrl(fileName)
-
-      // DB에 저장
-      const { error: dbErr } = await supabase.from('photos').insert([
+      const { error: err } = await supabase.from('photos').insert([
         {
           member_name: form.member_name,
           title: form.title.trim(),
           description: form.description.trim(),
-          image_url: publicUrl
+          image_url: form.image_url.trim()
         }
       ])
 
-      if (dbErr) throw dbErr
+      if (err) throw err
 
       setSuccess(true)
-      setForm({ member_name: '', title: '', description: '', image_file: null })
+      setForm({ member_name: '', title: '', description: '', image_url: '' })
       setShowUploadForm(false)
 
       setTimeout(() => {
@@ -170,14 +154,15 @@ export default function GalleryPage() {
               </div>
 
               <div>
-                <label className="block font-semibold mb-2">사진 선택</label>
+                <label className="block font-semibold mb-2">이미지 URL (Google Drive 공유 링크)</label>
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setForm({ ...form, image_file: e.target.files?.[0] || null })}
+                  type="url"
+                  value={form.image_url}
+                  onChange={(e) => setForm({ ...form, image_url: e.target.value })}
                   className="w-full px-4 py-2 border rounded-lg"
+                  placeholder="https://..."
                 />
-                {form.image_file && <p className="text-sm text-gray-600 mt-2">선택됨: {form.image_file.name}</p>}
+                <p className="text-xs text-gray-500 mt-2">💡 Google Drive에서 파일 우클릭 → 공유 → 누구나 액세스 가능 → 링크 복사</p>
               </div>
 
               <div>
