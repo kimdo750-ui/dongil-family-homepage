@@ -9,8 +9,8 @@ interface Photo {
   title: string
   description: string
   image_url: string
+  member_name: string
   created_at: string
-  member_name?: string
 }
 
 export default function GalleryPage() {
@@ -20,15 +20,11 @@ export default function GalleryPage() {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [deleting, setDeleting] = useState<string | null>(null)
 
-  const members = [
-    { name: '심희정', label: '심희정 (엄마)' },
-    { name: '김동일', label: '김동일 (아빠)' },
-    { name: '김태환', label: '김태환 (큰아들)' },
-    { name: '김민환', label: '김민환 (작은아들)' }
-  ]
+  const members = ['심희정', '김동일', '김태환', '김민환']
 
-  const [uploadForm, setUploadForm] = useState({
+  const [form, setForm] = useState({
     member_name: '',
     title: '',
     description: '',
@@ -36,309 +32,177 @@ export default function GalleryPage() {
   })
 
   useEffect(() => {
-    fetchPhotos()
+    loadPhotos()
   }, [])
 
-  const fetchPhotos = async () => {
+  const loadPhotos = async () => {
     try {
+      setLoading(true)
       const { data, error: err } = await supabase
         .from('photos')
         .select('*')
         .order('created_at', { ascending: false })
 
-      if (err) {
-        console.warn('포토 조회 실패:', err)
-        setPhotos([])
-      } else {
-        setPhotos(data || [])
-      }
-    } catch (error) {
-      console.warn('포토 로드 실패:', error)
-      setPhotos([])
+      if (err) throw err
+      setPhotos(data || [])
+    } catch (err: any) {
+      console.error('Error loading photos:', err)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleUploadChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setUploadForm(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
-
-  const handleUploadSubmit = async (e: React.FormEvent) => {
+  const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setSuccess(false)
 
-    if (!uploadForm.member_name) {
-      setError('멤버를 선택해주세요')
-      return
-    }
-    if (!uploadForm.title.trim()) {
-      setError('사진 제목을 입력해주세요')
-      return
-    }
-    if (!uploadForm.image_url.trim()) {
-      setError('이미지 URL을 입력해주세요')
+    if (!form.member_name || !form.title.trim() || !form.image_url.trim()) {
+      setError('모든 필드를 입력해주세요')
       return
     }
 
     setUploading(true)
-
     try {
-      // 멤버 이름으로 UUID 찾기
-      const { data: memberData, error: memberError } = await supabase
-        .from('members')
-        .select('id')
-        .eq('name', uploadForm.member_name)
-        .single()
+      const { error: err } = await supabase.from('photos').insert([
+        {
+          member_name: form.member_name,
+          title: form.title.trim(),
+          description: form.description.trim(),
+          image_url: form.image_url.trim()
+        }
+      ])
 
-      if (memberError || !memberData) {
-        setError('멤버 정보를 찾을 수 없습니다')
-        setUploading(false)
-        return
-      }
-
-      // 사진 저장
-      const { error: insertError } = await supabase
-        .from('photos')
-        .insert([
-          {
-            title: uploadForm.title.trim(),
-            description: uploadForm.description.trim(),
-            image_url: uploadForm.image_url.trim(),
-            uploaded_by: memberData.id
-          }
-        ])
-
-      if (insertError) throw insertError
+      if (err) throw err
 
       setSuccess(true)
-      setUploadForm({
-        member_name: '',
-        title: '',
-        description: '',
-        image_url: ''
-      })
+      setForm({ member_name: '', title: '', description: '', image_url: '' })
       setShowUploadForm(false)
 
       setTimeout(() => {
-        fetchPhotos()
+        loadPhotos()
       }, 500)
     } catch (err: any) {
-      setError('사진 저장 중 오류: ' + err.message)
+      setError('저장 실패: ' + err.message)
       console.error(err)
     } finally {
       setUploading(false)
     }
   }
 
-  const deletePhoto = async (photoId: string) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return
+  const handleDelete = async (id: string) => {
+    if (!confirm('삭제하시겠습니까?')) return
 
+    setDeleting(id)
     try {
-      const { error } = await supabase
-        .from('photos')
-        .delete()
-        .eq('id', photoId)
-
-      if (error) throw error
-      setPhotos(photos.filter(photo => photo.id !== photoId))
-    } catch (error) {
-      console.error('삭제 실패:', error)
-      alert('삭제 중 오류가 발생했습니다')
+      const { error: err } = await supabase.from('photos').delete().eq('id', id)
+      if (err) throw err
+      setPhotos(photos.filter(p => p.id !== id))
+    } catch (err: any) {
+      alert('삭제 실패: ' + err.message)
+      console.error(err)
+    } finally {
+      setDeleting(null)
     }
   }
 
-  const defaultPhotos = [
-    {
-      id: '1',
-      title: '우리 가족',
-      description: '함께하는 시간이 가장 소중합니다',
-      image_url: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=500&h=500&fit=crop',
-      created_at: new Date().toISOString(),
-      member_name: '심희정'
-    },
-    {
-      id: '2',
-      title: '가족 여행',
-      description: '추억을 만드는 순간들',
-      image_url: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=500&fit=crop',
-      created_at: new Date().toISOString(),
-      member_name: '김동일'
-    },
-    {
-      id: '3',
-      title: '함께의 시간',
-      description: '모두 함께 웃는 모습이 최고예요',
-      image_url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&h=500&fit=crop',
-      created_at: new Date().toISOString(),
-      member_name: '김태환'
-    },
-    {
-      id: '4',
-      title: '일상 속의 행복',
-      description: '작은 것에 감사하는 마음',
-      image_url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=500&h=500&fit=crop',
-      created_at: new Date().toISOString(),
-      member_name: '김민환'
-    }
-  ]
-
-  const displayPhotos = photos.length > 0 ? photos : defaultPhotos
+  const displayPhotos = photos
 
   return (
-    <div className="container mx-auto px-4 py-16">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h1 className="text-5xl font-bold mb-2">📸 갤러리</h1>
-            <p className="text-xl text-gray-600">
-              우리 가족의 소중한 순간들을 담았습니다
-            </p>
-          </div>
+    <div className="min-h-screen bg-gray-50 py-16">
+      <div className="container mx-auto px-4 max-w-6xl">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-5xl font-bold">📸 갤러리</h1>
           <button
             onClick={() => setShowUploadForm(!showUploadForm)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold whitespace-nowrap"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700"
           >
-            {showUploadForm ? '❌ 닫기' : '⬆️ 사진 업로드'}
+            {showUploadForm ? '닫기' : '사진 추가'}
           </button>
         </div>
 
         {showUploadForm && (
-          <div className="bg-blue-50 rounded-lg shadow-md p-8 mb-12">
-            <h2 className="text-2xl font-bold mb-6">사진 업로드</h2>
+          <div className="bg-white p-8 rounded-lg shadow-md mb-8">
+            {error && <div className="text-red-600 mb-4 p-4 bg-red-50 rounded">{error}</div>}
+            {success && <div className="text-green-600 mb-4 p-4 bg-green-50 rounded">✅ 저장되었습니다!</div>}
 
-            {error && (
-              <div className="mb-6 p-4 bg-red-100 border-2 border-red-300 rounded-lg text-red-800">
-                {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="mb-6 p-4 bg-green-100 border-2 border-green-300 rounded-lg text-green-800">
-                ✅ 사진이 저장되었습니다!
-              </div>
-            )}
-
-            <form onSubmit={handleUploadSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="block font-semibold mb-2">누가 업로드하나요?</label>
-                  <select
-                    name="member_name"
-                    value={uploadForm.member_name}
-                    onChange={handleUploadChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="">선택해주세요</option>
-                    {members.map((member, idx) => (
-                      <option key={idx} value={member.name}>
-                        {member.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-semibold mb-2">사진 제목</label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={uploadForm.title}
-                    onChange={handleUploadChange}
-                    placeholder="예: 가족 여행"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                  />
-                </div>
+            <form onSubmit={handleUpload} className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-2">이름</label>
+                <select
+                  value={form.member_name}
+                  onChange={(e) => setForm({ ...form, member_name: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg"
+                >
+                  <option value="">선택</option>
+                  {members.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <div className="mb-6">
+              <div>
+                <label className="block font-semibold mb-2">제목</label>
+                <input
+                  type="text"
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  placeholder="제목"
+                />
+              </div>
+
+              <div>
                 <label className="block font-semibold mb-2">이미지 URL</label>
                 <input
                   type="url"
-                  name="image_url"
-                  value={uploadForm.image_url}
-                  onChange={handleUploadChange}
-                  placeholder="https://example.com/image.jpg"
-                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                  value={form.image_url}
+                  onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  placeholder="https://..."
                 />
-                <p className="text-sm text-gray-600 mt-2">
-                  💡 구글 포토에서 사진 우클릭 → 이미지 주소 복사로 URL을 얻을 수 있습니다.
-                </p>
               </div>
 
-              <div className="mb-6">
+              <div>
                 <label className="block font-semibold mb-2">설명</label>
                 <textarea
-                  name="description"
-                  value={uploadForm.description}
-                  onChange={handleUploadChange}
-                  placeholder="이 사진에 대한 설명을 적어주세요"
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg"
                   rows={3}
-                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                  placeholder="설명"
                 />
               </div>
 
-              <div className="flex gap-4">
-                <button
-                  type="submit"
-                  disabled={uploading}
-                  className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50"
-                >
-                  {uploading ? '저장 중...' : '📤 저장'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowUploadForm(false)}
-                  className="flex-1 bg-gray-400 text-white px-6 py-3 rounded-lg hover:bg-gray-500 transition font-semibold"
-                >
-                  취소
-                </button>
-              </div>
+              <button type="submit" disabled={uploading} className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50">
+                {uploading ? '저장 중...' : '저장'}
+              </button>
             </form>
           </div>
         )}
 
         {loading ? (
-          <div className="text-center py-12">
-            <p className="text-lg text-gray-600">로딩 중...</p>
-          </div>
+          <p className="text-center text-gray-600">로딩 중...</p>
+        ) : displayPhotos.length === 0 ? (
+          <p className="text-center text-gray-600 py-12">사진이 없습니다</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayPhotos.map((photo) => (
-              <div
-                key={photo.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition group"
-              >
-                <div className="relative w-full h-64 overflow-hidden bg-gray-200">
-                  <img
-                    src={photo.image_url}
-                    alt={photo.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
-                    onError={(e) => {
-                      const img = e.target as HTMLImageElement
-                      img.src = 'https://via.placeholder.com/500x500?text=사진'
-                    }}
-                  />
-                </div>
+              <div key={photo.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <img src={photo.image_url} alt={photo.title} className="w-full h-64 object-cover" />
                 <div className="p-4">
-                  <h3 className="text-lg font-bold mb-2">{photo.title}</h3>
+                  <h3 className="font-bold text-lg mb-2">{photo.title}</h3>
                   <p className="text-gray-600 text-sm mb-3">{photo.description}</p>
                   <div className="flex justify-between items-center">
-                    {photo.member_name && (
-                      <div className="text-xs text-gray-500">
-                        <span>📌 {photo.member_name}</span>
-                      </div>
-                    )}
+                    <span className="text-xs text-gray-500">{photo.member_name}</span>
                     <button
-                      onClick={() => deletePhoto(photo.id)}
-                      className="text-xs bg-red-100 text-red-800 px-3 py-1 rounded hover:bg-red-200 transition"
+                      onClick={() => handleDelete(photo.id)}
+                      disabled={deleting === photo.id}
+                      className="text-xs bg-red-100 text-red-800 px-3 py-1 rounded hover:bg-red-200 disabled:opacity-50"
                     >
-                      🗑️ 삭제
+                      {deleting === photo.id ? '삭제 중...' : '삭제'}
                     </button>
                   </div>
                 </div>
@@ -346,19 +210,6 @@ export default function GalleryPage() {
             ))}
           </div>
         )}
-
-        <div className="mt-16 text-center">
-          <Link href="/timeline">
-            <button className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition mr-4">
-              📝 타임라인 보기
-            </button>
-          </Link>
-          <Link href="/family">
-            <button className="bg-pink-600 text-white px-8 py-3 rounded-lg hover:bg-pink-700 transition">
-              👨‍👩‍👧‍👦 가족소개로 돌아가기
-            </button>
-          </Link>
-        </div>
       </div>
     </div>
   )
