@@ -30,6 +30,7 @@ export default function GalleryPage() {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [members, setMembers] = useState<any[]>([])
 
   const [uploadForm, setUploadForm] = useState<UploadFormData>({
     member_id: '',
@@ -38,16 +39,25 @@ export default function GalleryPage() {
     image_url: ''
   })
 
-  const members = [
-    { id: 'mom', name: '심희정 (엄마)' },
-    { id: 'dad', name: '김동일 (아빠)' },
-    { id: 'son1', name: '김태환 (큰아들)' },
-    { id: 'son2', name: '김민환 (작은아들)' }
-  ]
-
   useEffect(() => {
     fetchPhotos()
+    fetchMembers()
   }, [])
+
+  const fetchMembers = async () => {
+    try {
+      const { data } = await supabase
+        .from('members')
+        .select('id, name, role')
+        .order('created_at', { ascending: true })
+
+      if (data) {
+        setMembers(data)
+      }
+    } catch (error) {
+      console.error('멤버 로드 실패:', error)
+    }
+  }
 
   const fetchPhotos = async () => {
     try {
@@ -101,24 +111,11 @@ export default function GalleryPage() {
     setUploading(true)
 
     try {
-      // 멤버 ID를 UUID로 변환
-      const { data: memberData, error: memberError } = await supabase
-        .from('members')
-        .select('id')
-        .eq('role', uploadForm.member_id.trim())
-        .single()
-
-      if (memberError || !memberData) {
-        console.error('Member lookup error:', memberError)
-        setError('멤버 정보를 찾을 수 없습니다. 다시 선택해주세요.')
-        return
-      }
-
       const { error: insertError } = await supabase
         .from('photos')
         .insert([
           {
-            uploaded_by: memberData.id,
+            uploaded_by: uploadForm.member_id,
             title: uploadForm.title.trim(),
             description: uploadForm.description.trim(),
             image_url: uploadForm.image_url.trim()
@@ -265,7 +262,7 @@ export default function GalleryPage() {
                     <option value="">선택해주세요</option>
                     {members.map(member => (
                       <option key={member.id} value={member.id}>
-                        {member.name}
+                        {member.name} ({member.role})
                       </option>
                     ))}
                   </select>
