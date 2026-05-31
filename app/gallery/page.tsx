@@ -13,7 +13,7 @@ interface Photo {
   members?: {
     name: string
     role: string
-  }
+  }[]
 }
 
 export default function GalleryPage() {
@@ -56,7 +56,7 @@ export default function GalleryPage() {
       description: '함께하는 시간이 가장 소중합니다',
       image_url: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=500&h=500&fit=crop',
       created_at: new Date().toISOString(),
-      members: { name: '심희정', role: 'mom' }
+      members: [{ name: '심희정', role: 'mom' }]
     },
     {
       id: '2',
@@ -64,7 +64,7 @@ export default function GalleryPage() {
       description: '추억을 만드는 순간들',
       image_url: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=500&fit=crop',
       created_at: new Date().toISOString(),
-      members: { name: '김동일', role: 'dad' }
+      members: [{ name: '김동일', role: 'dad' }]
     },
     {
       id: '3',
@@ -72,7 +72,7 @@ export default function GalleryPage() {
       description: '모두 함께 웃는 모습이 최고예요',
       image_url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&h=500&fit=crop',
       created_at: new Date().toISOString(),
-      members: { name: '김태환', role: 'son1' }
+      members: [{ name: '김태환', role: 'son1' }]
     },
     {
       id: '4',
@@ -80,7 +80,7 @@ export default function GalleryPage() {
       description: '작은 것에 감사하는 마음',
       image_url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=500&h=500&fit=crop',
       created_at: new Date().toISOString(),
-      members: { name: '김민환', role: 'son2' }
+      members: [{ name: '김민환', role: 'son2' }]
     },
     {
       id: '5',
@@ -88,7 +88,7 @@ export default function GalleryPage() {
       description: '밥상이 둥글다는 건 마음도 둥글다는 뜻',
       image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&h=500&fit=crop',
       created_at: new Date().toISOString(),
-      members: { name: '심희정', role: 'mom' }
+      members: [{ name: '심희정', role: 'mom' }]
     },
     {
       id: '6',
@@ -96,7 +96,7 @@ export default function GalleryPage() {
       description: '웃음이 최고의 약입니다',
       image_url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&h=500&fit=crop',
       created_at: new Date().toISOString(),
-      members: { name: '김민환', role: 'son2' }
+      members: [{ name: '김민환', role: 'son2' }]
     }
   ]
 
@@ -159,11 +159,11 @@ export default function GalleryPage() {
                   <div className="p-4">
                     <h3 className="text-lg font-bold mb-2">{photo.title}</h3>
                     <p className="text-gray-600 text-sm mb-3">{photo.description}</p>
-                    {photo.members && (
+                    {photo.members && photo.members[0] && (
                       <div className="text-xs text-gray-500 flex items-center gap-2">
                         <span>📌</span>
                         <span>
-                          {photo.members.name} ({photo.members.role})
+                          {photo.members[0].name} ({photo.members[0].role})
                         </span>
                       </div>
                     )}

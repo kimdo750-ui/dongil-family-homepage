@@ -13,7 +13,7 @@ interface Post {
   members?: {
     name: string
     role: string
-  }
+  }[]
 }
 
 export default function TimelinePage() {
@@ -57,7 +57,7 @@ export default function TimelinePage() {
       content: '가족 홈페이지를 오픈했습니다. 앞으로 많은 추억을 함께 나누길 기대합니다.',
       category: 'memory',
       created_at: new Date().toISOString(),
-      members: { name: '김동일', role: 'dad' }
+      members: [{ name: '김동일', role: 'dad' }]
     },
     {
       id: '2',
@@ -65,7 +65,7 @@ export default function TimelinePage() {
       content: '새로운 캠퍼스에서의 첫 수업이 너무 설렜어요. 열심히 공부하겠습니다!',
       category: 'university',
       created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      members: { name: '김태환', role: 'son1' }
+      members: [{ name: '김태환', role: 'son1' }]
     },
     {
       id: '3',
@@ -73,7 +73,7 @@ export default function TimelinePage() {
       content: '새로운 사업 아이디어를 구상 중입니다. 가족의 응원이 가장 큰 힘입니다.',
       category: 'business',
       created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-      members: { name: '김동일', role: 'dad' }
+      members: [{ name: '김동일', role: 'dad' }]
     },
     {
       id: '4',
@@ -81,7 +81,7 @@ export default function TimelinePage() {
       content: '1. 공부 2시간 □\n2. 가족과 저녁 시간 가지기 ☑\n3. 새로운 취미 배우기 □',
       category: 'daily',
       created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      members: { name: '김민환', role: 'son2' }
+      members: [{ name: '김민환', role: 'son2' }]
     },
     {
       id: '5',
@@ -89,7 +89,7 @@ export default function TimelinePage() {
       content: '가족이 함께 모여 밥을 먹으며 하루를 나누었습니다. 이런 순간이 최고예요.',
       category: 'memory',
       created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      members: { name: '심희정', role: 'mom' }
+      members: [{ name: '심희정', role: 'mom' }]
     },
     {
       id: '6',
@@ -97,7 +97,7 @@ export default function TimelinePage() {
       content: '이번 주말은 가족과 함께 외출을 계획하고 있습니다. 어디로 갈까요?',
       category: 'daily',
       created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      members: { name: '김민환', role: 'son2' }
+      members: [{ name: '김민환', role: 'son2' }]
     }
   ]
 
@@ -194,11 +194,11 @@ export default function TimelinePage() {
                       <p className="text-gray-700 mb-4 whitespace-pre-line">
                         {post.content}
                       </p>
-                      {post.members && (
+                      {post.members && post.members[0] && (
                         <div className="text-xs text-gray-500 flex items-center gap-2">
                           <span>👤</span>
                           <span>
-                            {post.members.name} ({post.members.role})
+                            {post.members[0].name} ({post.members[0].role})
                           </span>
                         </div>
                       )}
