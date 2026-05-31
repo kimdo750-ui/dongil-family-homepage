@@ -32,5 +32,8 @@ lerna-debug.log*
 *.swo
 *~
 
+# Scripts
+scripts/seed-members.js
+
 # OS
 Thumbs.db
