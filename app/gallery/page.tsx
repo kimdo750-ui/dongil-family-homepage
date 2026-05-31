@@ -27,7 +27,7 @@ export default function GalleryPage() {
     member_name: '',
     title: '',
     description: '',
-    image_url: ''
+    image_file: null as File | null
   })
 
   useEffect(() => {
@@ -56,26 +56,42 @@ export default function GalleryPage() {
     setError('')
     setSuccess(false)
 
-    if (!form.member_name || !form.title.trim() || !form.image_url.trim()) {
+    if (!form.member_name || !form.title.trim() || !form.image_file) {
       setError('모든 필드를 입력해주세요')
       return
     }
 
     setUploading(true)
     try {
-      const { error: err } = await supabase.from('photos').insert([
+      const file = form.image_file
+      const fileName = `${Date.now()}_${file.name}`
+
+      // Supabase Storage에 파일 업로드
+      const { data: uploadData, error: uploadErr } = await supabase.storage
+        .from('photos')
+        .upload(fileName, file)
+
+      if (uploadErr) throw uploadErr
+
+      // 공개 URL 가져오기
+      const { data: { publicUrl } } = supabase.storage
+        .from('photos')
+        .getPublicUrl(fileName)
+
+      // DB에 저장
+      const { error: dbErr } = await supabase.from('photos').insert([
         {
           member_name: form.member_name,
           title: form.title.trim(),
           description: form.description.trim(),
-          image_url: form.image_url.trim()
+          image_url: publicUrl
         }
       ])
 
-      if (err) throw err
+      if (dbErr) throw dbErr
 
       setSuccess(true)
-      setForm({ member_name: '', title: '', description: '', image_url: '' })
+      setForm({ member_name: '', title: '', description: '', image_file: null })
       setShowUploadForm(false)
 
       setTimeout(() => {
@@ -154,14 +170,14 @@ export default function GalleryPage() {
               </div>
 
               <div>
-                <label className="block font-semibold mb-2">이미지 URL</label>
+                <label className="block font-semibold mb-2">사진 선택</label>
                 <input
-                  type="url"
-                  value={form.image_url}
-                  onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setForm({ ...form, image_file: e.target.files?.[0] || null })}
                   className="w-full px-4 py-2 border rounded-lg"
-                  placeholder="https://..."
                 />
+                {form.image_file && <p className="text-sm text-gray-600 mt-2">선택됨: {form.image_file.name}</p>}
               </div>
 
               <div>
