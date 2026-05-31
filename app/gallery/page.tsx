@@ -89,6 +89,20 @@ export default function GalleryPage() {
     setUploading(true)
 
     try {
+      // 멤버 이름으로 UUID 찾기
+      const { data: memberData, error: memberError } = await supabase
+        .from('members')
+        .select('id')
+        .eq('name', uploadForm.member_name)
+        .single()
+
+      if (memberError || !memberData) {
+        setError('멤버 정보를 찾을 수 없습니다')
+        setUploading(false)
+        return
+      }
+
+      // 사진 저장
       const { error: insertError } = await supabase
         .from('photos')
         .insert([
@@ -96,26 +110,11 @@ export default function GalleryPage() {
             title: uploadForm.title.trim(),
             description: uploadForm.description.trim(),
             image_url: uploadForm.image_url.trim(),
-            member_name: uploadForm.member_name,
-            uploaded_by: uploadForm.member_name
+            uploaded_by: memberData.id
           }
         ])
 
-      if (insertError) {
-        // uploaded_by가 UUID 타입이면, member_name만 저장
-        const { error: insertError2 } = await supabase
-          .from('photos')
-          .insert([
-            {
-              title: uploadForm.title.trim(),
-              description: uploadForm.description.trim(),
-              image_url: uploadForm.image_url.trim(),
-              uploaded_by: '00000000-0000-0000-0000-000000000000'
-            }
-          ])
-
-        if (insertError2) throw insertError2
-      }
+      if (insertError) throw insertError
 
       setSuccess(true)
       setUploadForm({
