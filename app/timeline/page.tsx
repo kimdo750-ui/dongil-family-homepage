@@ -20,6 +20,28 @@ export default function TimelinePage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [deleting, setDeleting] = useState<string | null>(null)
+
+  const deletePost = async (postId: string) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return
+
+    setDeleting(postId)
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+
+      if (error) throw error
+
+      setPosts(posts.filter(post => post.id !== postId))
+    } catch (error) {
+      console.error('삭제 실패:', error)
+      alert('삭제 중 오류가 발생했습니다')
+    } finally {
+      setDeleting(null)
+    }
+  }
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -126,10 +148,19 @@ export default function TimelinePage() {
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-5xl font-bold mb-4 text-center">📝 타임라인</h1>
-        <p className="text-xl text-gray-600 text-center mb-12">
-          가족의 일상과 추억을 시간순으로 기록합니다
-        </p>
+        <div className="flex justify-between items-center mb-12">
+          <div>
+            <h1 className="text-5xl font-bold mb-4">📝 타임라인</h1>
+            <p className="text-xl text-gray-600">
+              가족의 일상과 추억을 시간순으로 기록합니다
+            </p>
+          </div>
+          <Link href="/write">
+            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold whitespace-nowrap">
+              ✏️ 글 작성
+            </button>
+          </Link>
+        </div>
 
         {loading ? (
           <div className="text-center py-12">
@@ -187,9 +218,18 @@ export default function TimelinePage() {
                             })}
                           </p>
                         </div>
-                        <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-                          {categoryLabel[post.category]}
-                        </span>
+                        <div className="flex gap-2">
+                          <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                            {categoryLabel[post.category]}
+                          </span>
+                          <button
+                            onClick={() => deletePost(post.id)}
+                            disabled={deleting === post.id}
+                            className="text-xs bg-red-100 text-red-800 px-3 py-1 rounded-full hover:bg-red-200 transition disabled:opacity-50"
+                          >
+                            {deleting === post.id ? '삭제 중...' : '🗑️ 삭제'}
+                          </button>
+                        </div>
                       </div>
                       <p className="text-gray-700 mb-4 whitespace-pre-line">
                         {post.content}
