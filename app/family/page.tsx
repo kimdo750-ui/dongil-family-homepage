@@ -110,28 +110,6 @@ export default function FamilyPage() {
         </div>
       </div>
 
-      {/* Values Section */}
-      <div className="py-32 px-4 bg-slate-50">
-        <div className="container mx-auto max-w-7xl">
-          <h2 className="text-4xl font-black text-slate-900 mb-16 text-center">우리가 함께하는 방식</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { emoji: '🤝', title: '함께 만드는 공간', desc: '모든 가족 구성원이 직접 이야기를 작성하고 추억을 기록할 수 있는 참여형 구조로 설계되었습니다.' },
-              { emoji: '📖', title: '기록의 연속성', desc: '과거의 추억(어린 시절 사진)부터 현재의 일상(사업, 대학 생활)까지 연결되는 시간의 흐름을 담습니다.' },
-              { emoji: '💝', title: '따뜻한 소통', desc: '가족 모두가 서로를 격려하고 응원하는 문화 속에서 각자의 성장을 나누고 기념합니다.' },
-              { emoji: '🚀', title: '미래지향적 성장', desc: '개인의 도전과 가족의 안정이 어우러져 함께 나아갈 수 있는 미래를 그립니다.' }
-            ].map((value) => (
-              <div key={value.title} className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
-                <div className="text-5xl mb-4">{value.emoji}</div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">{value.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{value.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Pets Section */}
       <div className="py-32 px-4 bg-white">
         <div className="container mx-auto max-w-7xl">
@@ -172,28 +150,24 @@ export default function FamilyPage() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="py-32 px-4 bg-gradient-to-br from-slate-900 to-blue-900">
+      {/* Values Section */}
+      <div className="py-32 px-4 bg-slate-50">
         <div className="container mx-auto max-w-7xl">
-          <h2 className="text-4xl font-black text-white mb-16 text-center">우리 가족의 수치</h2>
+          <h2 className="text-4xl font-black text-slate-900 mb-16 text-center">우리가 함께하는 방식</h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
-            <div>
-              <div className="text-5xl font-black mb-2">30+</div>
-              <p className="text-gray-300">년의 교육 경력</p>
-            </div>
-            <div>
-              <div className="text-5xl font-black mb-2">4</div>
-              <p className="text-gray-300">명의 가족 구성원</p>
-            </div>
-            <div>
-              <div className="text-5xl font-black mb-2">∞</div>
-              <p className="text-gray-300">개의 소중한 추억</p>
-            </div>
-            <div>
-              <div className="text-5xl font-black mb-2">3</div>
-              <p className="text-gray-300">개의 주요 사업</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { emoji: '🤝', title: '함께 만드는 공간', desc: '모든 가족 구성원이 직접 이야기를 작성하고 추억을 기록할 수 있는 참여형 구조로 설계되었습니다.' },
+              { emoji: '📖', title: '기록의 연속성', desc: '과거의 추억(어린 시절 사진)부터 현재의 일상(사업, 대학 생활)까지 연결되는 시간의 흐름을 담습니다.' },
+              { emoji: '💝', title: '따뜻한 소통', desc: '가족 모두가 서로를 격려하고 응원하는 문화 속에서 각자의 성장을 나누고 기념합니다.' },
+              { emoji: '🚀', title: '미래지향적 성장', desc: '개인의 도전과 가족의 안정이 어우러져 함께 나아갈 수 있는 미래를 그립니다.' }
+            ].map((value) => (
+              <div key={value.title} className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
+                <div className="text-5xl mb-4">{value.emoji}</div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{value.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{value.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

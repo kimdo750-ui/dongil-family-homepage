@@ -18,9 +18,9 @@ export default function RootLayout({
           <div className="container mx-auto px-4 py-4">
             <div className="flex justify-between items-center flex-wrap gap-4">
               <a href="/" className="flex items-center flex-shrink-0">
-                <img src="/images/logo.png" alt="동일가족" className="h-16 md:h-32 w-auto" />
+                <img src="/images/logo.png" alt="동일가족" className="h-20 md:h-40 w-auto" />
               </a>
-              <ul className="flex flex-wrap gap-3 md:gap-6 text-sm md:text-base">
+              <ul className="flex flex-wrap gap-3 md:gap-6 text-base md:text-lg font-semibold">
                 <li><a href="/" className="hover:text-blue-600 transition">홈</a></li>
                 <li><a href="/family" className="hover:text-blue-600 transition">가족소개</a></li>
                 <li><a href="/gallery" className="hover:text-blue-600 transition">갤러리</a></li>
