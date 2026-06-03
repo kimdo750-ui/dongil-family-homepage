@@ -135,37 +135,37 @@ export default function GalleryPage() {
   const displayPhotos = photos
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
+    <div className="min-h-screen bg-gray-50 py-8 md:py-16">
       <div className="container mx-auto px-4 max-w-6xl">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-5xl font-bold">📸 갤러리</h1>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <h1 className="text-3xl md:text-5xl font-bold">📸 갤러리</h1>
           <button
             onClick={() => setShowUploadForm(!showUploadForm)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold hover:bg-blue-700 text-sm md:text-base whitespace-nowrap"
           >
             {showUploadForm ? '닫기' : '사진 추가'}
           </button>
         </div>
 
         {showUploadForm && (
-          <div className="bg-white p-8 rounded-lg shadow-md mb-8">
-            {error && <div className="text-red-600 mb-4 p-4 bg-red-50 rounded">{error}</div>}
-            {success && <div className="text-green-600 mb-4 p-4 bg-green-50 rounded">✅ 저장되었습니다!</div>}
+          <div className="bg-white p-4 md:p-8 rounded-lg shadow-md mb-8">
+            {error && <div className="text-red-600 mb-4 p-4 bg-red-50 rounded text-sm md:text-base">{error}</div>}
+            {success && <div className="text-green-600 mb-4 p-4 bg-green-50 rounded text-sm md:text-base">✅ 저장되었습니다!</div>}
 
-            <div className="mb-6 flex gap-4 border-b">
+            <div className="mb-6 flex gap-2 md:gap-4 border-b overflow-x-auto">
               <button
                 type="button"
                 onClick={() => {
                   setUploadMethod('file')
                   setForm({ ...form, image_url: '' })
                 }}
-                className={`pb-2 font-semibold transition ${
+                className={`pb-2 font-semibold transition text-sm md:text-base whitespace-nowrap ${
                   uploadMethod === 'file'
                     ? 'text-blue-600 border-b-2 border-blue-600'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                📁 파일 업로드
+                📁 파일업로드
               </button>
               <button
                 type="button"
@@ -173,23 +173,23 @@ export default function GalleryPage() {
                   setUploadMethod('url')
                   setForm({ ...form, image_url: '' })
                 }}
-                className={`pb-2 font-semibold transition ${
+                className={`pb-2 font-semibold transition text-sm md:text-base whitespace-nowrap ${
                   uploadMethod === 'url'
                     ? 'text-blue-600 border-b-2 border-blue-600'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                🔗 URL 입력
+                🔗 URL입력
               </button>
             </div>
 
             <form onSubmit={handleUpload} className="space-y-4">
               <div>
-                <label className="block font-semibold mb-2">이름</label>
+                <label className="block font-semibold mb-2 text-sm md:text-base">이름</label>
                 <select
                   value={form.member_name}
                   onChange={(e) => setForm({ ...form, member_name: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg"
+                  className="w-full px-3 md:px-4 py-2 border rounded-lg text-sm md:text-base"
                 >
                   <option value="">선택</option>
                   {members.map((m) => (
@@ -261,21 +261,21 @@ export default function GalleryPage() {
         ) : displayPhotos.length === 0 ? (
           <p className="text-center text-gray-600 py-12">사진이 없습니다</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {displayPhotos.map((photo) => (
-              <div key={photo.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <img src={photo.image_url} alt={photo.title} className="w-full h-64 object-cover" />
-                <div className="p-4">
-                  <h3 className="font-bold text-lg mb-2">{photo.title}</h3>
-                  <p className="text-gray-600 text-sm mb-3">{photo.description}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">{photo.member_name}</span>
+              <div key={photo.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                <img src={photo.image_url} alt={photo.title} className="w-full h-40 md:h-64 object-cover" />
+                <div className="p-3 md:p-4">
+                  <h3 className="font-bold text-base md:text-lg mb-2 line-clamp-2">{photo.title}</h3>
+                  <p className="text-gray-600 text-xs md:text-sm mb-3 line-clamp-2">{photo.description}</p>
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-xs text-gray-500 truncate">{photo.member_name}</span>
                     <button
                       onClick={() => handleDelete(photo.id)}
                       disabled={deleting === photo.id}
-                      className="text-xs bg-red-100 text-red-800 px-3 py-1 rounded hover:bg-red-200 disabled:opacity-50"
+                      className="text-xs bg-red-100 text-red-800 px-2 md:px-3 py-1 rounded hover:bg-red-200 disabled:opacity-50 whitespace-nowrap"
                     >
-                      {deleting === photo.id ? '삭제 중...' : '삭제'}
+                      {deleting === photo.id ? '삭제...' : '삭제'}
                     </button>
                   </div>
                 </div>
