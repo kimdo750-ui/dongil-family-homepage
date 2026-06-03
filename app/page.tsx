@@ -12,17 +12,27 @@ interface Post {
   member_id?: string
 }
 
+interface Photo {
+  id: string
+  title: string
+  description: string
+  image_url: string
+  member_name: string
+  created_at: string
+}
+
 export default function Home() {
   const [recentPosts, setRecentPosts] = useState<Post[]>([])
+  const [portfolioPhotos, setPortfolioPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     loadRecentPosts()
+    loadPortfolioPhotos()
   }, [])
 
   const loadRecentPosts = () => {
     try {
-      setLoading(true)
       const stored = localStorage.getItem('posts')
       if (stored) {
         const allPosts = JSON.parse(stored)
@@ -36,6 +46,21 @@ export default function Home() {
       console.error('Error loading posts:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadPortfolioPhotos = () => {
+    try {
+      const stored = localStorage.getItem('photos')
+      if (stored) {
+        const allPhotos = JSON.parse(stored)
+        const recent = allPhotos
+          .sort((a: Photo, b: Photo) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 6)
+        setPortfolioPhotos(recent)
+      }
+    } catch (err) {
+      console.error('Error loading photos:', err)
     }
   }
 
@@ -121,14 +146,32 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
-                <div className="h-64 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-6xl group-hover:scale-110 transition duration-300">
-                  📸
+            {portfolioPhotos.length > 0 ? (
+              portfolioPhotos.map((photo) => (
+                <div key={photo.id} className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
+                  <img
+                    src={photo.image_url}
+                    alt={photo.title}
+                    className="w-full h-64 object-cover group-hover:scale-110 transition duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition duration-300 flex items-end p-4">
+                    <div className="text-white opacity-0 group-hover:opacity-100 transition duration-300">
+                      <p className="font-bold">{photo.title}</p>
+                      <p className="text-sm text-gray-200">{photo.member_name}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition duration-300"></div>
-              </div>
-            ))}
+              ))
+            ) : (
+              [...Array(6)].map((_, i) => (
+                <div key={i} className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
+                  <div className="h-64 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-6xl group-hover:scale-110 transition duration-300">
+                    📸
+                  </div>
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition duration-300"></div>
+                </div>
+              ))
+            )}
           </div>
 
           <div className="text-center">
