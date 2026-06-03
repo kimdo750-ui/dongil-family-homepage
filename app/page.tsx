@@ -97,8 +97,8 @@ export default function Home() {
                 어렸을 때부터 함께 자란 추억들과 일상을 담은 특별한 공간입니다. 가족 모두의 이야기를 함께 나누세요.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <a href="#portfolio" className="bg-slate-900 text-white px-8 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:scale-105 transition transform duration-300 text-center">
-                  📸 포트폴리오
+                <a href="/gallery" className="bg-slate-900 text-white px-8 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:scale-105 transition transform duration-300 text-center">
+                  📸 갤러리
                 </a>
                 <a href="/timeline" className="border-2 border-slate-900 text-slate-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-slate-900 hover:text-white transition duration-300 text-center">
                   📝 이야기
