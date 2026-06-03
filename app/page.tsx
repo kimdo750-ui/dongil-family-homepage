@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 
 interface Post {
   id: string
@@ -9,6 +8,7 @@ interface Post {
   content: string
   category: string
   created_at: string
+  published?: boolean
   member_id?: string
 }
 
@@ -20,18 +20,18 @@ export default function Home() {
     loadRecentPosts()
   }, [])
 
-  const loadRecentPosts = async () => {
+  const loadRecentPosts = () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('published', true)
-        .order('created_at', { ascending: false })
-        .limit(4)
-
-      if (error) throw error
-      setRecentPosts(data || [])
+      const stored = localStorage.getItem('posts')
+      if (stored) {
+        const allPosts = JSON.parse(stored)
+        const recent = allPosts
+          .filter((p: Post) => p.published !== false)
+          .sort((a: Post, b: Post) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 4)
+        setRecentPosts(recent)
+      }
     } catch (err) {
       console.error('Error loading posts:', err)
     } finally {

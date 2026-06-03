@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
 interface Photo {
@@ -34,16 +33,16 @@ export default function PortfolioPage() {
     loadPhotos()
   }, [])
 
-  const loadPhotos = async () => {
+  const loadPhotos = () => {
     try {
       setLoading(true)
-      const { data, error: err } = await supabase
-        .from('photos')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (err) throw err
-      setPhotos(data || [])
+      const stored = localStorage.getItem('photos')
+      if (stored) {
+        const allPhotos = JSON.parse(stored)
+        setPhotos(allPhotos.sort((a: Photo, b: Photo) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        ))
+      }
     } catch (err: any) {
       console.error('Error loading photos:', err)
     } finally {
@@ -51,7 +50,7 @@ export default function PortfolioPage() {
     }
   }
 
-  const handleUpload = async (e: React.FormEvent) => {
+  const handleUpload = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setSuccess(false)
@@ -63,16 +62,17 @@ export default function PortfolioPage() {
 
     setUploading(true)
     try {
-      const { error: err } = await supabase.from('photos').insert([
-        {
-          member_name: form.member_name,
-          title: form.title.trim(),
-          description: form.description.trim(),
-          image_url: form.image_url.trim()
-        }
-      ])
-
-      if (err) throw err
+      const allPhotos = JSON.parse(localStorage.getItem('photos') || '[]')
+      const newPhoto: Photo = {
+        id: Date.now().toString(),
+        member_name: form.member_name,
+        title: form.title.trim(),
+        description: form.description.trim(),
+        image_url: form.image_url.trim(),
+        created_at: new Date().toISOString()
+      }
+      allPhotos.push(newPhoto)
+      localStorage.setItem('photos', JSON.stringify(allPhotos))
 
       setSuccess(true)
       setForm({ member_name: '', title: '', description: '', image_url: '' })
@@ -89,13 +89,14 @@ export default function PortfolioPage() {
     }
   }
 
-  const deletePhoto = async (id: string) => {
+  const deletePhoto = (id: string) => {
     if (!confirm('정말 삭제하시겠습니까?')) return
 
     try {
-      const { error: err } = await supabase.from('photos').delete().eq('id', id)
-      if (err) throw err
-      setPhotos(photos.filter(p => p.id !== id))
+      const allPhotos = JSON.parse(localStorage.getItem('photos') || '[]')
+      const updated = allPhotos.filter((p: Photo) => p.id !== id)
+      localStorage.setItem('photos', JSON.stringify(updated))
+      setPhotos(updated)
     } catch (err: any) {
       alert('삭제 실패: ' + err.message)
     }
