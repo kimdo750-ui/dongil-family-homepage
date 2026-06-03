@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -14,9 +14,7 @@ interface Post {
   published: boolean
 }
 
-export const dynamic = 'force-dynamic'
-
-export default function WritePage() {
+function WriteContent() {
   const searchParams = useSearchParams()
   const editId = searchParams.get('id')
 
@@ -213,5 +211,13 @@ export default function WritePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function WritePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center"><p className="text-lg text-gray-600">로딩 중...</p></div>}>
+      <WriteContent />
+    </Suspense>
   )
 }
