@@ -36,7 +36,7 @@ export default function FamilyPage() {
       id: '4',
       name: '김민환',
       emoji: '✈️',
-      image: '/images/family/minhwan.jpg',
+      image: '/images/family/minhwan.png',
       title: '공군 ROTC 준비 & 항공 드론 전문가',
       tags: ['공군ROTC', '드론항공', '국방기술'],
       bio: '항공 모빌리티 분야의 전문가가 되기 위해 드론항공학과 진학과 공군 ROTC 장교 임관을 목표로 준비 중입니다.\n국방 분야에서 혁신과 기술로 기여하고자 하는 진지한 다짐을 지니고 있으며,\n2026년부터 2033년까지 7년의 명확한 커리어 로드맵을 구축하여 전문 장교로의 성장을 준비 중입니다.',
