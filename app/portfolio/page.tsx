@@ -19,6 +19,7 @@ export default function PortfolioPage() {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [uploadMethod, setUploadMethod] = useState<'url' | 'file'>('url')
 
   const members = ['심희정', '김동일', '김태환', '김민환']
 
@@ -50,6 +51,25 @@ export default function PortfolioPage() {
     }
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (file.size > maxSize) {
+      setError('파일 크기가 5MB를 초과합니다')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string
+      setForm({ ...form, image_url: dataUrl })
+      setError('')
+    }
+    reader.readAsDataURL(file)
+  }
+
   const handleUpload = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -57,6 +77,11 @@ export default function PortfolioPage() {
 
     if (!form.member_name || !form.title.trim() || !form.image_url.trim()) {
       setError('모든 필드를 입력해주세요')
+      return
+    }
+
+    if (uploadMethod === 'url' && !form.image_url.trim().startsWith('http')) {
+      setError('유효한 URL을 입력해주세요')
       return
     }
 
@@ -127,6 +152,37 @@ export default function PortfolioPage() {
               {error && <div className="text-red-600 mb-4 p-4 bg-red-50 rounded">{error}</div>}
               {success && <div className="text-green-600 mb-4 p-4 bg-green-50 rounded">✅ 저장되었습니다!</div>}
 
+              <div className="mb-6 flex gap-4 border-b">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUploadMethod('file')
+                    setForm({ ...form, image_url: '' })
+                  }}
+                  className={`pb-2 font-semibold transition ${
+                    uploadMethod === 'file'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  📁 파일 업로드
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUploadMethod('url')
+                    setForm({ ...form, image_url: '' })
+                  }}
+                  className={`pb-2 font-semibold transition ${
+                    uploadMethod === 'url'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  🔗 URL 입력
+                </button>
+              </div>
+
               <form onSubmit={handleUpload} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -154,16 +210,32 @@ export default function PortfolioPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block font-semibold mb-2">이미지 URL</label>
-                  <input
-                    type="url"
-                    value={form.image_url}
-                    onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg"
-                    placeholder="https://..."
-                  />
-                </div>
+                {uploadMethod === 'file' ? (
+                  <div>
+                    <label className="block font-semibold mb-2">📁 이미지 파일 (최대 5MB)</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="w-full px-4 py-2 border rounded-lg"
+                    />
+                    {form.image_url && (
+                      <div className="mt-2 text-sm text-green-600">✅ 파일 선택됨</div>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block font-semibold mb-2">이미지 URL</label>
+                    <input
+                      type="url"
+                      value={form.image_url}
+                      onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                      className="w-full px-4 py-2 border rounded-lg"
+                      placeholder="https://..."
+                    />
+                    <p className="text-xs text-gray-500 mt-1">구글 포토 공유 링크를 붙여넣어도 됩니다</p>
+                  </div>
+                )}
 
                 <div>
                   <label className="block font-semibold mb-2">설명</label>
