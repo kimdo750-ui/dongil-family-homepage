@@ -155,7 +155,7 @@ export default function GalleryPage() {
         </div>
 
         {showUploadForm && (
-          <div className="bg-white p-4 md:p-8 rounded-lg shadow-md mb-8">
+          <div className="bg-white p-4 md:p-8 rounded-lg shadow-md mb-12">
             {error && <div className="text-red-600 mb-4 p-4 bg-red-50 rounded text-sm md:text-base">{error}</div>}
             {success && <div className="text-green-600 mb-4 p-4 bg-green-50 rounded text-sm md:text-base">✅ 저장되었습니다!</div>}
 
