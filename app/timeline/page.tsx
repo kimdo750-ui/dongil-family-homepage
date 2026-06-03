@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
 
 interface Post {
   id: string
@@ -18,15 +19,19 @@ export default function TimelinePage() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [deleting, setDeleting] = useState<string | null>(null)
 
-  const deletePost = (postId: string) => {
+  const deletePost = async (postId: string) => {
     if (!confirm('정말 삭제하시겠습니까?')) return
 
     setDeleting(postId)
     try {
-      const allPosts = JSON.parse(localStorage.getItem('posts') || '[]')
-      const updated = allPosts.filter((post: Post) => post.id !== postId)
-      localStorage.setItem('posts', JSON.stringify(updated))
-      setPosts(updated)
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+
+      if (error) throw error
+
+      setPosts(posts.filter(post => post.id !== postId))
     } catch (error) {
       console.error('삭제 실패:', error)
       alert('삭제 중 오류가 발생했습니다')
@@ -36,16 +41,17 @@ export default function TimelinePage() {
   }
 
   useEffect(() => {
-    const loadPosts = () => {
+    const loadPosts = async () => {
       try {
-        const stored = localStorage.getItem('posts')
-        if (stored) {
-          const allPosts = JSON.parse(stored)
-          const published = allPosts.filter((p: Post) => p.published)
-          setPosts(published.sort((a: Post, b: Post) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          ))
-        }
+        const { data, error } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('published', true)
+          .order('created_at', { ascending: false })
+
+        if (error) throw error
+
+        setPosts((data || []) as Post[])
       } catch (error) {
         console.error('타임라인 로드 실패:', error)
       } finally {

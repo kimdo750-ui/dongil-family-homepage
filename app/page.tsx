@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
 
 interface Post {
   id: string
@@ -31,17 +32,18 @@ export default function Home() {
     loadPortfolioPhotos()
   }, [])
 
-  const loadRecentPosts = () => {
+  const loadRecentPosts = async () => {
     try {
-      const stored = localStorage.getItem('posts')
-      if (stored) {
-        const allPosts = JSON.parse(stored)
-        const recent = allPosts
-          .filter((p: Post) => p.published !== false)
-          .sort((a: Post, b: Post) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-          .slice(0, 4)
-        setRecentPosts(recent)
-      }
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('published', true)
+        .order('created_at', { ascending: false })
+        .limit(4)
+
+      if (error) throw error
+
+      setRecentPosts((data || []) as Post[])
     } catch (err) {
       console.error('Error loading posts:', err)
     } finally {
@@ -49,16 +51,17 @@ export default function Home() {
     }
   }
 
-  const loadPortfolioPhotos = () => {
+  const loadPortfolioPhotos = async () => {
     try {
-      const stored = localStorage.getItem('photos')
-      if (stored) {
-        const allPhotos = JSON.parse(stored)
-        const recent = allPhotos
-          .sort((a: Photo, b: Photo) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-          .slice(0, 6)
-        setPortfolioPhotos(recent)
-      }
+      const { data, error } = await supabase
+        .from('photos')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(6)
+
+      if (error) throw error
+
+      setPortfolioPhotos((data || []) as Photo[])
     } catch (err) {
       console.error('Error loading photos:', err)
     }

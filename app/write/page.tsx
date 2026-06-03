@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
 
 export default function WritePage() {
   const [title, setTitle] = useState('')
@@ -11,7 +12,7 @@ export default function WritePage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setSuccess(false)
@@ -23,17 +24,18 @@ export default function WritePage() {
 
     setLoading(true)
     try {
-      const allPosts = JSON.parse(localStorage.getItem('posts') || '[]')
-      const newPost = {
-        id: Date.now().toString(),
-        title: title.trim(),
-        content: content.trim(),
-        category,
-        created_at: new Date().toISOString(),
-        published: true
-      }
-      allPosts.push(newPost)
-      localStorage.setItem('posts', JSON.stringify(allPosts))
+      const { error: insertError } = await supabase
+        .from('posts')
+        .insert([
+          {
+            title: title.trim(),
+            content: content.trim(),
+            category,
+            published: true
+          }
+        ])
+
+      if (insertError) throw insertError
 
       setSuccess(true)
       setTitle('')
@@ -44,7 +46,7 @@ export default function WritePage() {
         window.location.href = '/timeline'
       }, 1500)
     } catch (err: any) {
-      setError('저장 실패: ' + err.message)
+      setError('저장 실패: ' + (err.message || '알 수 없는 오류'))
       console.error(err)
     } finally {
       setLoading(false)

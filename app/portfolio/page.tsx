@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
 
 interface Photo {
   id: string
@@ -34,16 +35,17 @@ export default function PortfolioPage() {
     loadPhotos()
   }, [])
 
-  const loadPhotos = () => {
+  const loadPhotos = async () => {
     try {
       setLoading(true)
-      const stored = localStorage.getItem('photos')
-      if (stored) {
-        const allPhotos = JSON.parse(stored)
-        setPhotos(allPhotos.sort((a: Photo, b: Photo) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        ))
-      }
+      const { data, error: fetchError } = await supabase
+        .from('photos')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (fetchError) throw fetchError
+
+      setPhotos((data || []) as Photo[])
     } catch (err: any) {
       console.error('Error loading photos:', err)
     } finally {
@@ -55,7 +57,7 @@ export default function PortfolioPage() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    const maxSize = 5 * 1024 * 1024 // 5MB
+    const maxSize = 5 * 1024 * 1024
     if (file.size > maxSize) {
       setError('파일 크기가 5MB를 초과합니다')
       return
@@ -70,7 +72,7 @@ export default function PortfolioPage() {
     reader.readAsDataURL(file)
   }
 
-  const handleUpload = (e: React.FormEvent) => {
+  const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setSuccess(false)
@@ -87,17 +89,18 @@ export default function PortfolioPage() {
 
     setUploading(true)
     try {
-      const allPhotos = JSON.parse(localStorage.getItem('photos') || '[]')
-      const newPhoto: Photo = {
-        id: Date.now().toString(),
-        member_name: form.member_name,
-        title: form.title.trim(),
-        description: form.description.trim(),
-        image_url: form.image_url.trim(),
-        created_at: new Date().toISOString()
-      }
-      allPhotos.push(newPhoto)
-      localStorage.setItem('photos', JSON.stringify(allPhotos))
+      const { error: insertError } = await supabase
+        .from('photos')
+        .insert([
+          {
+            member_name: form.member_name,
+            title: form.title.trim(),
+            description: form.description.trim(),
+            image_url: form.image_url.trim()
+          }
+        ])
+
+      if (insertError) throw insertError
 
       setSuccess(true)
       setForm({ member_name: '', title: '', description: '', image_url: '' })
@@ -107,23 +110,27 @@ export default function PortfolioPage() {
         loadPhotos()
       }, 500)
     } catch (err: any) {
-      setError('저장 실패: ' + err.message)
+      setError('저장 실패: ' + (err.message || '알 수 없는 오류'))
       console.error(err)
     } finally {
       setUploading(false)
     }
   }
 
-  const deletePhoto = (id: string) => {
+  const deletePhoto = async (id: string) => {
     if (!confirm('정말 삭제하시겠습니까?')) return
 
     try {
-      const allPhotos = JSON.parse(localStorage.getItem('photos') || '[]')
-      const updated = allPhotos.filter((p: Photo) => p.id !== id)
-      localStorage.setItem('photos', JSON.stringify(updated))
-      setPhotos(updated)
+      const { error } = await supabase
+        .from('photos')
+        .delete()
+        .eq('id', id)
+
+      if (error) throw error
+
+      setPhotos(photos.filter(photo => photo.id !== id))
     } catch (err: any) {
-      alert('삭제 실패: ' + err.message)
+      alert('삭제 실패: ' + (err.message || '알 수 없는 오류'))
     }
   }
 
