@@ -140,11 +140,11 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Portfolio Section */}
-      <div id="portfolio" className="py-32 px-4">
+      {/* Gallery Section */}
+      <div id="gallery" className="py-32 px-4">
         <div className="container mx-auto max-w-7xl">
           <div className="mb-20">
-            <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-4">포트폴리오</h2>
+            <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-4">갤러리</h2>
             <p className="text-xl text-gray-600">가족의 소중한 순간들을 사진으로 담았습니다</p>
           </div>
 
@@ -178,8 +178,8 @@ export default function Home() {
           </div>
 
           <div className="text-center">
-            <a href="/portfolio" className="inline-block bg-slate-900 text-white px-12 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:scale-105 transition transform duration-300">
-              전체 포트폴리오 보기→
+            <a href="/gallery" className="inline-block bg-slate-900 text-white px-12 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:scale-105 transition transform duration-300">
+              전체 갤러리 보기→
             </a>
           </div>
         </div>

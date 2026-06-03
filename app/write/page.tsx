@@ -1,16 +1,62 @@
 ﻿'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
+interface Post {
+  id: string
+  title: string
+  content: string
+  category: string
+  created_at: string
+  published: boolean
+}
+
+export const dynamic = 'force-dynamic'
+
 export default function WritePage() {
+  const searchParams = useSearchParams()
+  const editId = searchParams.get('id')
+
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [category, setCategory] = useState('daily')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [pageLoading, setPageLoading] = useState(!!editId)
+
+  useEffect(() => {
+    if (editId) {
+      const loadPost = async () => {
+        try {
+          const { data, error: fetchError } = await supabase
+            .from('posts')
+            .select('*')
+            .eq('id', editId)
+            .single()
+
+          if (fetchError) throw fetchError
+
+          if (data) {
+            const post = data as Post
+            setTitle(post.title)
+            setContent(post.content)
+            setCategory(post.category)
+            setIsEditing(true)
+          }
+        } catch (err) {
+          console.error('글 불러오기 실패:', err)
+        } finally {
+          setPageLoading(false)
+        }
+      }
+      loadPost()
+    }
+  }, [editId])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,18 +70,31 @@ export default function WritePage() {
 
     setLoading(true)
     try {
-      const { error: insertError } = await supabase
-        .from('posts')
-        .insert([
-          {
+      if (isEditing && editId) {
+        const { error: updateError } = await supabase
+          .from('posts')
+          .update({
             title: title.trim(),
             content: content.trim(),
-            category,
-            published: true
-          }
-        ])
+            category
+          })
+          .eq('id', editId)
 
-      if (insertError) throw insertError
+        if (updateError) throw updateError
+      } else {
+        const { error: insertError } = await supabase
+          .from('posts')
+          .insert([
+            {
+              title: title.trim(),
+              content: content.trim(),
+              category,
+              published: true
+            }
+          ])
+
+        if (insertError) throw insertError
+      }
 
       setSuccess(true)
       setTitle('')
@@ -53,6 +112,14 @@ export default function WritePage() {
     }
   }
 
+  if (pageLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center">
+        <p className="text-lg text-gray-600">로딩 중...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-2xl mx-auto">
@@ -63,8 +130,12 @@ export default function WritePage() {
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-4xl font-bold mb-2 text-slate-900">✏️ 새로운 이야기</h1>
-          <p className="text-gray-600 mb-8">가족의 추억과 일상을 공유하세요</p>
+          <h1 className="text-4xl font-bold mb-2 text-slate-900">
+            {isEditing ? '✏️ 이야기 수정' : '✏️ 새로운 이야기'}
+          </h1>
+          <p className="text-gray-600 mb-8">
+            {isEditing ? '기존 이야기를 수정하세요' : '가족의 추억과 일상을 공유하세요'}
+          </p>
 
           {error && (
             <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
@@ -127,7 +198,7 @@ export default function WritePage() {
                 disabled={loading}
                 className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50"
               >
-                {loading ? '저장 중...' : '💾 저장'}
+                {loading ? '저장 중...' : isEditing ? '수정 저장' : '💾 저장'}
               </button>
               <Link href="/timeline" className="flex-1">
                 <button

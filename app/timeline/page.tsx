@@ -212,6 +212,14 @@ export default function TimelinePage() {
                           <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
                             {categoryLabel[post.category]}
                           </span>
+                          <Link href={`/write?id=${post.id}`}>
+                            <button
+                              type="button"
+                              className="text-xs bg-amber-100 text-amber-800 px-3 py-1 rounded-full hover:bg-amber-200 transition"
+                            >
+                              ✏️ 수정
+                            </button>
+                          </Link>
                           <button
                             onClick={() => deletePost(post.id)}
                             disabled={deleting === post.id}
