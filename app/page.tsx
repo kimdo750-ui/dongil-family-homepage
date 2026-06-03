@@ -194,7 +194,7 @@ export default function Home() {
             {portfolioPhotos.length > 0 ? (
               portfolioPhotos.map((photo) => (
                 <div key={photo.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-                  <img src={photo.image_url} alt={photo.title} className="w-full h-56 object-cover" />
+                  <img src={photo.image_url} alt={photo.title} className="w-full h-80 md:h-56 object-cover object-center" />
                   <div className="p-4">
                     <h3 className="font-bold text-lg mb-2">{photo.title}</h3>
                     <p className="text-gray-600 text-sm">{photo.member_name}</p>
