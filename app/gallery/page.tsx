@@ -270,8 +270,8 @@ export default function GalleryPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {displayPhotos.map((photo) => (
-              <div key={photo.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl hover:scale-105 transition transform duration-300 cursor-pointer">
-                <img src={photo.image_url} alt={photo.title} className="w-full h-80 md:h-64 object-cover object-center group-hover:scale-110 transition duration-300" />
+              <div key={photo.id} className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 cursor-pointer">
+                <img src={photo.image_url} alt={photo.title} className="w-full h-80 md:h-64 object-cover object-center group-hover:opacity-90 transition duration-300" />
                 <div className="p-3 md:p-4">
                   <h3 className="font-bold text-base md:text-lg mb-2 line-clamp-2">{photo.title}</h3>
                   <p className="text-gray-600 text-xs md:text-sm mb-3 line-clamp-2">{photo.description}</p>

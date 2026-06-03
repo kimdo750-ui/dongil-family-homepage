@@ -25,7 +25,6 @@ export default function RootLayout({
                 <li><a href="/family" className="hover:text-blue-600 transition">가족소개</a></li>
                 <li><a href="/gallery" className="hover:text-blue-600 transition">갤러리</a></li>
                 <li><a href="/timeline" className="hover:text-blue-600 transition">타임라인</a></li>
-                <li><a href="/write" className="hover:text-blue-600 transition">글쓰기</a></li>
               </ul>
             </div>
           </div>

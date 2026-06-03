@@ -1,0 +1,22 @@
+
+> dongil-family-homepage@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 6s
+ ○ Compiling /timeline ...
+ ✓ Compiled /timeline in 2.9s (588 modules)
+ GET /timeline 200 in 4496ms
+ ✓ Compiled in 1630ms (302 modules)
+ ✓ Compiled /write in 307ms (582 modules)
+ ✓ Compiled /_not-found in 160ms (585 modules)
+ GET /_next/static/webpack/webpack.e918c9f7c7706541.hot-update.js 404 in 320ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /write 200 in 11ms
+ GET /timeline 200 in 247ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 768ms (812 modules)
