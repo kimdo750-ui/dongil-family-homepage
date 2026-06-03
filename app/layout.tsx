@@ -18,7 +18,7 @@ export default function RootLayout({
           <div className="container mx-auto px-4 py-4">
             <div className="flex justify-between items-center flex-wrap gap-4">
               <a href="/" className="flex items-center flex-shrink-0">
-                <img src="/images/logo.png" alt="동일가족" className="h-26 md:h-48 w-auto" />
+                <img src="/images/logo.png" alt="동일가족" className="h-24 md:h-48 w-auto" />
               </a>
               <ul className="flex flex-wrap gap-3 md:gap-6 text-base md:text-lg font-semibold">
                 <li><a href="/" className="hover:text-blue-600 transition">홈</a></li>
