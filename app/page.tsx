@@ -182,6 +182,38 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Gallery Section */}
+      <div className="py-32 px-4 bg-white">
+        <div className="container mx-auto max-w-7xl">
+          <div className="mb-20">
+            <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-4">갤러리</h2>
+            <p className="text-xl text-gray-600">모든 가족 사진들</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+            {portfolioPhotos.length > 0 ? (
+              portfolioPhotos.map((photo) => (
+                <div key={photo.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                  <img src={photo.image_url} alt={photo.title} className="w-full h-56 object-cover" />
+                  <div className="p-4">
+                    <h3 className="font-bold text-lg mb-2">{photo.title}</h3>
+                    <p className="text-gray-600 text-sm">{photo.member_name}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-gray-600 col-span-full py-12">갤러리 사진이 없습니다</p>
+            )}
+          </div>
+
+          <div className="text-center">
+            <a href="/gallery" className="inline-block bg-slate-900 text-white px-12 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:scale-105 transition transform duration-300">
+              전체 갤러리 보기→
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Stories Section */}
       <div className="py-32 px-4 bg-slate-50">
         <div className="container mx-auto max-w-7xl">

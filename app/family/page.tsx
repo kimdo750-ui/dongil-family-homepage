@@ -132,6 +132,46 @@ export default function FamilyPage() {
         </div>
       </div>
 
+      {/* Pets Section */}
+      <div className="py-32 px-4 bg-white">
+        <div className="container mx-auto max-w-7xl">
+          <h2 className="text-4xl font-black text-slate-900 mb-4 text-center">우리 가족의 일원</h2>
+          <p className="text-xl text-gray-600 text-center mb-16 max-w-2xl mx-auto">
+            어렸을 때부터 함께 자란 우리 고양이들. 태환이가 농장에서 데려온 아이들로, 독수리에게 잡혀 먹을 뻔했지만 우리 집에서 건강하게 자라고 있습니다.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="bg-gradient-to-br from-orange-100 to-pink-100 rounded-2xl p-8 hover:shadow-2xl transition">
+              <div className="aspect-square rounded-xl overflow-hidden mb-6 bg-gray-200">
+                <img
+                  src="/images/cats/cat1.jpg"
+                  alt="하루"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">하루 🐱</h3>
+              <p className="text-gray-700">
+                어렸을 때부터 우리와 함께한 사랑스러운 가족 일원입니다. 따뜻한 성격으로 모두의 마음을 녹입니다.
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl p-8 hover:shadow-2xl transition">
+              <div className="aspect-square rounded-xl overflow-hidden mb-6 bg-gray-200">
+                <img
+                  src="/images/cats/cat2.jpg"
+                  alt="이틀이"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">이틀이 🐈</h3>
+              <p className="text-gray-700">
+                활발하고 장난스러운 성격으로 우리에게 매일 행복을 선사합니다. 큰아들 태환이의 특별한 친구입니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Stats */}
       <div className="py-32 px-4 bg-gradient-to-br from-slate-900 to-blue-900">
         <div className="container mx-auto max-w-7xl">
