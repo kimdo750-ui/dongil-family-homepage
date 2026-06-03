@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 
 interface Photo {
   id: string
@@ -20,6 +19,7 @@ export default function GalleryPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [uploadMethod, setUploadMethod] = useState<'url' | 'file'>('url')
 
   const members = ['심희정', '김동일', '김태환', '김민환']
 
@@ -34,16 +34,16 @@ export default function GalleryPage() {
     loadPhotos()
   }, [])
 
-  const loadPhotos = async () => {
+  const loadPhotos = () => {
     try {
       setLoading(true)
-      const { data, error: err } = await supabase
-        .from('photos')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (err) throw err
-      setPhotos(data || [])
+      const stored = localStorage.getItem('photos')
+      if (stored) {
+        const allPhotos = JSON.parse(stored)
+        setPhotos(allPhotos.sort((a: Photo, b: Photo) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        ))
+      }
     } catch (err: any) {
       console.error('Error loading photos:', err)
     } finally {
@@ -51,7 +51,26 @@ export default function GalleryPage() {
     }
   }
 
-  const handleUpload = async (e: React.FormEvent) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (file.size > maxSize) {
+      setError('파일 크기가 5MB를 초과합니다')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string
+      setForm({ ...form, image_url: dataUrl })
+      setError('')
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleUpload = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setSuccess(false)
@@ -61,22 +80,29 @@ export default function GalleryPage() {
       return
     }
 
+    if (uploadMethod === 'url' && !form.image_url.trim().startsWith('http')) {
+      setError('유효한 URL을 입력해주세요')
+      return
+    }
+
     setUploading(true)
     try {
-      const { error: err } = await supabase.from('photos').insert([
-        {
-          member_name: form.member_name,
-          title: form.title.trim(),
-          description: form.description.trim(),
-          image_url: form.image_url.trim()
-        }
-      ])
-
-      if (err) throw err
+      const allPhotos = JSON.parse(localStorage.getItem('photos') || '[]')
+      const newPhoto: Photo = {
+        id: Date.now().toString(),
+        member_name: form.member_name,
+        title: form.title.trim(),
+        description: form.description.trim(),
+        image_url: form.image_url.trim(),
+        created_at: new Date().toISOString()
+      }
+      allPhotos.push(newPhoto)
+      localStorage.setItem('photos', JSON.stringify(allPhotos))
 
       setSuccess(true)
       setForm({ member_name: '', title: '', description: '', image_url: '' })
       setShowUploadForm(false)
+      setUploadMethod('url')
 
       setTimeout(() => {
         loadPhotos()
@@ -89,14 +115,15 @@ export default function GalleryPage() {
     }
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm('삭제하시겠습니까?')) return
 
     setDeleting(id)
     try {
-      const { error: err } = await supabase.from('photos').delete().eq('id', id)
-      if (err) throw err
-      setPhotos(photos.filter(p => p.id !== id))
+      const allPhotos = JSON.parse(localStorage.getItem('photos') || '[]')
+      const updated = allPhotos.filter((p: Photo) => p.id !== id)
+      localStorage.setItem('photos', JSON.stringify(updated))
+      setPhotos(updated)
     } catch (err: any) {
       alert('삭제 실패: ' + err.message)
       console.error(err)
@@ -124,6 +151,37 @@ export default function GalleryPage() {
           <div className="bg-white p-8 rounded-lg shadow-md mb-8">
             {error && <div className="text-red-600 mb-4 p-4 bg-red-50 rounded">{error}</div>}
             {success && <div className="text-green-600 mb-4 p-4 bg-green-50 rounded">✅ 저장되었습니다!</div>}
+
+            <div className="mb-6 flex gap-4 border-b">
+              <button
+                type="button"
+                onClick={() => {
+                  setUploadMethod('file')
+                  setForm({ ...form, image_url: '' })
+                }}
+                className={`pb-2 font-semibold transition ${
+                  uploadMethod === 'file'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                📁 파일 업로드
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUploadMethod('url')
+                  setForm({ ...form, image_url: '' })
+                }}
+                className={`pb-2 font-semibold transition ${
+                  uploadMethod === 'url'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                🔗 URL 입력
+              </button>
+            </div>
 
             <form onSubmit={handleUpload} className="space-y-4">
               <div>
@@ -153,16 +211,32 @@ export default function GalleryPage() {
                 />
               </div>
 
-              <div>
-                <label className="block font-semibold mb-2">이미지 URL</label>
-                <input
-                  type="url"
-                  value={form.image_url}
-                  onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg"
-                  placeholder="https://..."
-                />
-              </div>
+              {uploadMethod === 'file' ? (
+                <div>
+                  <label className="block font-semibold mb-2">📁 이미지 파일 (최대 5MB)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                  {form.image_url && (
+                    <div className="mt-2 text-sm text-green-600">✅ 파일 선택됨</div>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <label className="block font-semibold mb-2">이미지 URL</label>
+                  <input
+                    type="url"
+                    value={form.image_url}
+                    onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                    className="w-full px-4 py-2 border rounded-lg"
+                    placeholder="https://..."
+                  />
+                  <p className="text-xs text-gray-500 mt-1">구글 포토 공유 링크를 붙여넣어도 됩니다</p>
+                </div>
+              )}
 
               <div>
                 <label className="block font-semibold mb-2">설명</label>

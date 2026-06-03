@@ -1,22 +1,62 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
+
+interface Post {
+  id: string
+  title: string
+  content: string
+  category: string
+  created_at: string
+  member_id?: string
+}
+
 export default function Home() {
+  const [recentPosts, setRecentPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadRecentPosts()
+  }, [])
+
+  const loadRecentPosts = async () => {
+    try {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('published', true)
+        .order('created_at', { ascending: false })
+        .limit(4)
+
+      if (error) throw error
+      setRecentPosts(data || [])
+    } catch (err) {
+      console.error('Error loading posts:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
+  }
+
+  const getCategoryEmoji = (category: string) => {
+    const emojis: { [key: string]: string } = {
+      daily: '📅',
+      university: '🎓',
+      business: '💼',
+      memory: '💝'
+    }
+    return emojis[category] || '📝'
+  }
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="fixed w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center max-w-7xl">
-          <div className="text-2xl font-black text-slate-900">동일가족</div>
-          <div className="flex gap-6">
-            <a href="#portfolio" className="text-slate-900 font-semibold hover:text-blue-600 transition">포트폴리오</a>
-            <a href="/timeline" className="text-slate-900 font-semibold hover:text-blue-600 transition">이야기</a>
-            <a href="/family" className="text-slate-900 font-semibold hover:text-blue-600 transition">가족</a>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Section */}
-      <div className="relative pt-32 pb-24 px-4 overflow-hidden">
+      <div className="relative pt-20 pb-24 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 -z-10"></div>
         <div className="container mx-auto max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -37,8 +77,12 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            <div className="text-8xl text-center md:text-right">
-              👨‍👩‍👧‍👦
+            <div className="rounded-2xl overflow-hidden shadow-2xl">
+              <img
+                src="/images/family/family.jpg"
+                alt="동일가족"
+                className="w-full h-auto object-cover"
+              />
             </div>
           </div>
         </div>
@@ -103,20 +147,31 @@ export default function Home() {
             <p className="text-xl text-gray-600">우리 가족의 일상과 추억</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-300 group cursor-pointer">
-                <div className="text-sm text-gray-500 mb-4">2024년 {i + 1}월</div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition">
-                  이야기 제목 {i + 1}
-                </h3>
-                <p className="text-gray-600 mb-6 line-clamp-3">
-                  가족과 함께한 소중한 순간과 일상의 이야기를 담았습니다. 매일이 소중한 추억이 됩니다.
-                </p>
-                <div className="text-blue-600 font-semibold group-hover:translate-x-2 transition">더 읽기→</div>
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-12 text-gray-600">로딩 중...</div>
+          ) : recentPosts.length === 0 ? (
+            <div className="text-center py-12 text-gray-600">아직 이야기가 없습니다. 타임라인에서 첫 이야기를 작성해보세요!</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+              {recentPosts.map((post) => (
+                <a key={post.id} href="/timeline" className="group">
+                  <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-300 cursor-pointer h-full flex flex-col">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                      <span>{getCategoryEmoji(post.category)}</span>
+                      <span>{formatDate(post.created_at)}</span>
+                    </div>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition">
+                      {post.title}
+                    </h3>
+                    <p className="text-gray-600 mb-6 line-clamp-3 flex-grow">
+                      {post.content || '이야기 내용이 없습니다'}
+                    </p>
+                    <div className="text-blue-600 font-semibold group-hover:translate-x-2 transition">더 읽기→</div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
 
           <div className="text-center">
             <a href="/timeline" className="inline-block bg-slate-900 text-white px-12 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:scale-105 transition transform duration-300">
@@ -134,28 +189,17 @@ export default function Home() {
             <p className="text-xl text-gray-600">동일가족의 네 명</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {[
-              { name: '심희정', role: '(엄마)' },
-              { name: '김동일', role: '(아빠)' },
-              { name: '김태환', role: '(큰아들)' },
-              { name: '김민환', role: '(작은아들)' }
-            ].map((person, i) => (
-              <div key={i} className="group text-center">
-                <div className="w-40 h-40 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-6xl shadow-lg group-hover:shadow-2xl group-hover:scale-110 transition duration-300">
-                  👤
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900">
-                  {person.name}
-                </h3>
-                <p className="text-gray-600">{person.role}</p>
-              </div>
-            ))}
+          <div className="mb-16 rounded-2xl overflow-hidden shadow-2xl hover:shadow-xl transition">
+            <img
+              src="/images/family/family.jpg"
+              alt="동일가족"
+              className="w-full h-auto object-cover hover:scale-105 transition duration-300"
+            />
           </div>
 
           <div className="text-center">
             <a href="/family" className="inline-block border-2 border-slate-900 text-slate-900 px-12 py-4 rounded-lg font-bold text-lg hover:bg-slate-900 hover:text-white transition duration-300">
-              가족 상세 정보→
+              각 멤버 상세 정보→
             </a>
           </div>
         </div>

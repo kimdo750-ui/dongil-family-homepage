@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
 interface Post {
@@ -10,10 +9,7 @@ interface Post {
   content: string
   category: string
   created_at: string
-  members?: {
-    name: string
-    role: string
-  }[]
+  published: boolean
 }
 
 export default function TimelinePage() {
@@ -22,19 +18,15 @@ export default function TimelinePage() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [deleting, setDeleting] = useState<string | null>(null)
 
-  const deletePost = async (postId: string) => {
+  const deletePost = (postId: string) => {
     if (!confirm('정말 삭제하시겠습니까?')) return
 
     setDeleting(postId)
     try {
-      const { error } = await supabase
-        .from('posts')
-        .delete()
-        .eq('id', postId)
-
-      if (error) throw error
-
-      setPosts(posts.filter(post => post.id !== postId))
+      const allPosts = JSON.parse(localStorage.getItem('posts') || '[]')
+      const updated = allPosts.filter((post: Post) => post.id !== postId)
+      localStorage.setItem('posts', JSON.stringify(updated))
+      setPosts(updated)
     } catch (error) {
       console.error('삭제 실패:', error)
       alert('삭제 중 오류가 발생했습니다')
@@ -44,24 +36,16 @@ export default function TimelinePage() {
   }
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const loadPosts = () => {
       try {
-        const { data, error } = await supabase
-          .from('posts')
-          .select(`
-            id,
-            title,
-            content,
-            category,
-            created_at,
-            members:member_id(name, role)
-          `)
-          .eq('published', true)
-          .order('created_at', { ascending: false })
-
-        if (error) throw error
-
-        setPosts(data || [])
+        const stored = localStorage.getItem('posts')
+        if (stored) {
+          const allPosts = JSON.parse(stored)
+          const published = allPosts.filter((p: Post) => p.published)
+          setPosts(published.sort((a: Post, b: Post) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          ))
+        }
       } catch (error) {
         console.error('타임라인 로드 실패:', error)
       } finally {
@@ -69,7 +53,7 @@ export default function TimelinePage() {
       }
     }
 
-    fetchPosts()
+    loadPosts()
   }, [])
 
   const defaultPosts = [
@@ -234,14 +218,6 @@ export default function TimelinePage() {
                       <p className="text-gray-700 mb-4 whitespace-pre-line">
                         {post.content}
                       </p>
-                      {post.members && post.members[0] && (
-                        <div className="text-xs text-gray-500 flex items-center gap-2">
-                          <span>👤</span>
-                          <span>
-                            {post.members[0].name} ({post.members[0].role})
-                          </span>
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))
