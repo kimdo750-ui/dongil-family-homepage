@@ -138,18 +138,20 @@ export default function TimelinePage() {
   return (
     <div className="container mx-auto px-3 md:px-4 py-8 md:py-16">
       <div className="max-w-4xl mx-auto">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-12 gap-4 md:gap-0">
-          <div>
-            <h1 className="text-3xl md:text-5xl font-bold mb-4">📝 타임라인</h1>
-            <p className="text-base md:text-xl text-gray-600">
-              가족의 일상과 추억을 시간순으로 기록합니다
-            </p>
+        <div className="mb-12">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
+            <div>
+              <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-4">📝 타임라인</h1>
+              <p className="text-base md:text-xl text-gray-600">
+                가족의 일상과 추억을 시간순으로 기록합니다
+              </p>
+            </div>
+            <Link href="/write">
+              <button className="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-blue-700 transition font-semibold whitespace-nowrap text-sm sm:text-base">
+                ✏️ 글 작성
+              </button>
+            </Link>
           </div>
-          <Link href="/write">
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold whitespace-nowrap">
-              ✏️ 글 작성
-            </button>
-          </Link>
         </div>
 
         {loading ? (
@@ -158,10 +160,10 @@ export default function TimelinePage() {
           </div>
         ) : (
           <>
-            <div className="mb-8 flex justify-center gap-2 flex-wrap">
+            <div className="mb-8 flex justify-between gap-1 sm:gap-2 overflow-x-auto pb-2">
               <button
                 onClick={() => setSelectedCategory('all')}
-                className={`px-3 py-2 text-sm md:px-4 md:py-2 md:text-base rounded-lg font-semibold transition ${
+                className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base rounded-lg font-semibold transition whitespace-nowrap ${
                   selectedCategory === 'all'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
@@ -173,7 +175,7 @@ export default function TimelinePage() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-2 text-sm md:px-4 md:py-2 md:text-base rounded-lg font-semibold transition ${
+                  className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base rounded-lg font-semibold transition whitespace-nowrap ${
                     selectedCategory === cat
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
