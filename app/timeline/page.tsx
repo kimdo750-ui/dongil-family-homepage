@@ -136,12 +136,12 @@ export default function TimelinePage() {
       : displayPosts.filter((post) => post.category === selectedCategory)
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="container mx-auto px-3 md:px-4 py-8 md:py-16">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-12">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-12 gap-4 md:gap-0">
           <div>
-            <h1 className="text-5xl font-bold mb-4">📝 타임라인</h1>
-            <p className="text-xl text-gray-600">
+            <h1 className="text-3xl md:text-5xl font-bold mb-4">📝 타임라인</h1>
+            <p className="text-base md:text-xl text-gray-600">
               가족의 일상과 추억을 시간순으로 기록합니다
             </p>
           </div>
@@ -161,7 +161,7 @@ export default function TimelinePage() {
             <div className="mb-8 flex justify-center gap-2 flex-wrap">
               <button
                 onClick={() => setSelectedCategory('all')}
-                className={`px-4 py-2 rounded-lg font-semibold transition ${
+                className={`px-3 py-2 text-sm md:px-4 md:py-2 md:text-base rounded-lg font-semibold transition ${
                   selectedCategory === 'all'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
@@ -173,7 +173,7 @@ export default function TimelinePage() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-lg font-semibold transition ${
+                  className={`px-3 py-2 text-sm md:px-4 md:py-2 md:text-base rounded-lg font-semibold transition ${
                     selectedCategory === cat
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
@@ -187,20 +187,20 @@ export default function TimelinePage() {
             <div className="space-y-6">
               {filteredPosts.length > 0 ? (
                 filteredPosts.map((post, index) => (
-                  <div key={post.id} className="flex gap-4">
+                  <div key={post.id} className="flex gap-2 md:gap-4">
                     <div className="flex flex-col items-center">
-                      <div className="w-4 h-4 bg-blue-600 rounded-full"></div>
+                      <div className="w-3 h-3 md:w-4 md:h-4 bg-blue-600 rounded-full mt-2"></div>
                       {index < filteredPosts.length - 1 && (
-                        <div className="w-1 h-24 bg-blue-200 mt-2"></div>
+                        <div className="w-1 h-20 md:h-24 bg-blue-200 mt-2"></div>
                       )}
                     </div>
-                    <div className="bg-white rounded-lg shadow-md p-6 flex-1 hover:shadow-lg transition">
-                      <div className="flex items-start justify-between mb-2">
+                    <div className="bg-white rounded-lg shadow-md p-3 md:p-6 flex-1 hover:shadow-lg transition">
+                      <div className="flex flex-col gap-3">
                         <div>
-                          <h3 className="text-2xl font-bold">
+                          <h3 className="text-lg md:text-2xl font-bold">
                             {categoryEmoji[post.category]} {post.title}
                           </h3>
-                          <p className="text-sm text-gray-500 mt-1">
+                          <p className="text-xs md:text-sm text-gray-500 mt-1">
                             {new Date(post.created_at).toLocaleDateString('ko-KR', {
                               year: 'numeric',
                               month: 'long',
@@ -208,14 +208,14 @@ export default function TimelinePage() {
                             })}
                           </p>
                         </div>
-                        <div className="flex gap-2">
-                          <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                        <div className="flex flex-wrap gap-2">
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 md:px-3 py-1 rounded-full">
                             {categoryLabel[post.category]}
                           </span>
                           <Link href={`/write?id=${post.id}`}>
                             <button
                               type="button"
-                              className="text-xs bg-amber-100 text-amber-800 px-3 py-1 rounded-full hover:bg-amber-200 transition"
+                              className="text-xs bg-amber-100 text-amber-800 px-2 md:px-3 py-1 rounded-full hover:bg-amber-200 transition"
                             >
                               ✏️ 수정
                             </button>
@@ -223,13 +223,13 @@ export default function TimelinePage() {
                           <button
                             onClick={() => deletePost(post.id)}
                             disabled={deleting === post.id}
-                            className="text-xs bg-red-100 text-red-800 px-3 py-1 rounded-full hover:bg-red-200 transition disabled:opacity-50"
+                            className="text-xs bg-red-100 text-red-800 px-2 md:px-3 py-1 rounded-full hover:bg-red-200 transition disabled:opacity-50"
                           >
                             {deleting === post.id ? '삭제 중...' : '🗑️ 삭제'}
                           </button>
                         </div>
                       </div>
-                      <p className="text-gray-700 mb-4 whitespace-pre-line">
+                      <p className="text-sm md:text-base text-gray-700 mt-3 md:mt-4 whitespace-pre-line">
                         {post.content}
                       </p>
                     </div>
@@ -246,14 +246,14 @@ export default function TimelinePage() {
           </>
         )}
 
-        <div className="mt-16 text-center">
+        <div className="mt-16 text-center flex flex-col md:flex-row gap-3 md:gap-4 justify-center">
           <Link href="/gallery">
-            <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition mr-4">
+            <button className="bg-blue-600 text-white px-6 md:px-8 py-3 rounded-lg hover:bg-blue-700 transition w-full md:w-auto">
               📸 갤러리 보기
             </button>
           </Link>
           <Link href="/family">
-            <button className="bg-pink-600 text-white px-8 py-3 rounded-lg hover:bg-pink-700 transition">
+            <button className="bg-pink-600 text-white px-6 md:px-8 py-3 rounded-lg hover:bg-pink-700 transition w-full md:w-auto">
               👨‍👩‍👧‍👦 가족소개로 돌아가기
             </button>
           </Link>
