@@ -137,36 +137,36 @@ export default function PortfolioPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-slate-900 text-white py-16 px-4">
+      <div className="bg-slate-900 text-white py-8 md:py-16 px-3 md:px-4">
         <div className="container mx-auto max-w-7xl">
-          <h1 className="text-5xl font-black mb-4">📸 포트폴리오</h1>
-          <p className="text-xl text-gray-300">가족의 소중한 순간들을 담았습니다</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-2 md:mb-4">📸 포트폴리오</h1>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300">가족의 소중한 순간들을 담았습니다</p>
         </div>
       </div>
 
       {/* Upload Form */}
-      <div className="py-8 px-4 bg-white border-b">
+      <div className="py-6 md:py-8 px-3 md:px-4 bg-white border-b">
         <div className="container mx-auto max-w-7xl">
           <button
             onClick={() => setShowUploadForm(!showUploadForm)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+            className="bg-blue-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-sm md:text-base"
           >
             {showUploadForm ? '❌ 닫기' : '➕ 사진 추가'}
           </button>
 
           {showUploadForm && (
-            <div className="mt-8 bg-blue-50 p-8 rounded-lg">
-              {error && <div className="text-red-600 mb-4 p-4 bg-red-50 rounded">{error}</div>}
-              {success && <div className="text-green-600 mb-4 p-4 bg-green-50 rounded">✅ 저장되었습니다!</div>}
+            <div className="mt-6 md:mt-8 bg-blue-50 p-4 md:p-8 rounded-lg">
+              {error && <div className="text-red-600 mb-4 p-3 md:p-4 bg-red-50 rounded text-sm md:text-base">{error}</div>}
+              {success && <div className="text-green-600 mb-4 p-3 md:p-4 bg-green-50 rounded text-sm md:text-base">✅ 저장되었습니다!</div>}
 
-              <div className="mb-6 flex gap-4 border-b">
+              <div className="mb-6 flex gap-2 md:gap-4 border-b overflow-x-auto">
                 <button
                   type="button"
                   onClick={() => {
                     setUploadMethod('file')
                     setForm({ ...form, image_url: '' })
                   }}
-                  className={`pb-2 font-semibold transition ${
+                  className={`pb-2 font-semibold transition text-sm md:text-base whitespace-nowrap ${
                     uploadMethod === 'file'
                       ? 'text-blue-600 border-b-2 border-blue-600'
                       : 'text-gray-600 hover:text-gray-800'
@@ -180,7 +180,7 @@ export default function PortfolioPage() {
                     setUploadMethod('url')
                     setForm({ ...form, image_url: '' })
                   }}
-                  className={`pb-2 font-semibold transition ${
+                  className={`pb-2 font-semibold transition text-sm md:text-base whitespace-nowrap ${
                     uploadMethod === 'url'
                       ? 'text-blue-600 border-b-2 border-blue-600'
                       : 'text-gray-600 hover:text-gray-800'
@@ -269,29 +269,29 @@ export default function PortfolioPage() {
       </div>
 
       {/* Gallery */}
-      <div className="py-16 px-4">
+      <div className="py-12 md:py-16 px-3 md:px-4">
         <div className="container mx-auto max-w-7xl">
           {loading ? (
-            <p className="text-center text-gray-600">로딩 중...</p>
+            <p className="text-center text-gray-600 text-sm md:text-base">로딩 중...</p>
           ) : photos.length === 0 ? (
-            <p className="text-center text-gray-600 py-12">아직 사진이 없습니다</p>
+            <p className="text-center text-gray-600 text-sm md:text-base py-12">아직 사진이 없습니다</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
               {photos.map((photo) => (
                 <div key={photo.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition group">
                   <img
                     src={photo.image_url}
                     alt={photo.title}
-                    className="w-full h-64 object-cover group-hover:scale-110 transition duration-300"
+                    className="w-full h-40 sm:h-48 md:h-64 object-cover group-hover:scale-110 transition duration-300"
                   />
-                  <div className="p-6">
-                    <h3 className="font-bold text-lg text-slate-900 mb-2">{photo.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4">{photo.description}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">{photo.member_name}</span>
+                  <div className="p-3 md:p-6">
+                    <h3 className="font-bold text-base md:text-lg text-slate-900 mb-2">{photo.title}</h3>
+                    <p className="text-gray-600 text-xs md:text-sm mb-3 md:mb-4 line-clamp-2">{photo.description}</p>
+                    <div className="flex justify-between items-center gap-2">
+                      <span className="text-xs text-gray-500 truncate">{photo.member_name}</span>
                       <button
                         onClick={() => deletePhoto(photo.id)}
-                        className="text-xs bg-red-100 text-red-800 px-3 py-1 rounded hover:bg-red-200"
+                        className="text-xs bg-red-100 text-red-800 px-2 md:px-3 py-1 rounded hover:bg-red-200 whitespace-nowrap"
                       >
                         🗑️ 삭제
                       </button>
@@ -305,9 +305,9 @@ export default function PortfolioPage() {
       </div>
 
       {/* Navigation */}
-      <div className="py-12 px-4 bg-gray-50 text-center">
+      <div className="py-8 md:py-12 px-3 md:px-4 bg-gray-50 text-center">
         <Link href="/">
-          <button className="bg-slate-900 text-white px-8 py-3 rounded-lg font-semibold hover:bg-slate-800 transition">
+          <button className="bg-slate-900 text-white px-6 md:px-8 py-2 md:py-3 rounded-lg font-semibold hover:bg-slate-800 transition text-sm md:text-base">
             ← 홈으로
           </button>
         </Link>

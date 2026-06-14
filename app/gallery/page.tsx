@@ -142,10 +142,10 @@ export default function GalleryPage() {
   const displayPhotos = photos
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 md:py-16">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-          <h1 className="text-3xl md:text-5xl font-bold">📸 갤러리</h1>
+    <div className="min-h-screen bg-gray-50 py-6 md:py-8 lg:py-16">
+      <div className="container mx-auto px-3 md:px-4 max-w-6xl">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4 mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">📸 갤러리</h1>
           <button
             onClick={() => setShowUploadForm(!showUploadForm)}
             className="bg-blue-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold hover:bg-blue-700 text-sm md:text-base whitespace-nowrap"

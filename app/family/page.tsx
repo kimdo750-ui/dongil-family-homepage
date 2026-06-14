@@ -47,49 +47,49 @@ export default function FamilyPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-slate-900 text-white py-16 px-4">
+      <div className="bg-slate-900 text-white py-8 md:py-16 px-3 md:px-4">
         <div className="container mx-auto max-w-7xl">
-          <h1 className="text-5xl font-black mb-4">가족 소개</h1>
-          <p className="text-xl text-gray-300">어렸을 때부터 함께한 4명의 가족 구성원</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-2 md:mb-4">가족 소개</h1>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300">어렸을 때부터 함께한 4명의 가족 구성원</p>
         </div>
       </div>
 
       {/* Intro Section */}
-      <div className="py-16 px-4 bg-blue-50">
+      <div className="py-8 md:py-16 px-3 md:px-4 bg-blue-50">
         <div className="container mx-auto max-w-7xl text-center">
-          <h2 className="text-4xl font-black text-slate-900 mb-6">우리 가족을 소개합니다</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 mb-4 md:mb-6">우리 가족을 소개합니다</h2>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
             어렸을 때부터 함께 자란 4명의 가족 구성원, 그들의 꿈과 도전, 그리고 함께하는 성장의 이야기
           </p>
         </div>
       </div>
 
       {/* Members */}
-      <div className="py-32 px-4">
-        <div className="container mx-auto max-w-7xl space-y-20">
+      <div className="py-16 md:py-32 px-3 md:px-4">
+        <div className="container mx-auto max-w-7xl space-y-12 md:space-y-20">
           {members.map((member, idx) => (
-            <div key={member.id} className={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${idx % 2 === 1 ? 'md:grid-flow-dense' : ''}`}>
+            <div key={member.id} className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center ${idx % 2 === 1 ? 'md:grid-flow-dense' : ''}`}>
               <div className={idx % 2 === 1 ? 'md:col-start-2' : ''}>
-                <div className="mb-8"></div>
-                <h3 className="text-4xl font-black text-slate-900 mb-2">{member.name}</h3>
-                <p className="text-2xl text-blue-600 font-bold mb-4">{member.title}</p>
+                <div className="mb-6 md:mb-8"></div>
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 mb-2">{member.name}</h3>
+                <p className="text-lg sm:text-xl md:text-2xl text-blue-600 font-bold mb-3 md:mb-4">{member.title}</p>
 
-                <div className="flex gap-2 mb-6 flex-wrap">
+                <div className="flex gap-2 mb-4 md:mb-6 flex-wrap">
                   {member.tags.map((tag) => (
-                    <span key={tag} className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold">
+                    <span key={tag} className="bg-blue-100 text-blue-800 px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-semibold">
                       #{tag}
                     </span>
                   ))}
                 </div>
 
-                <p className="text-gray-700 text-lg leading-relaxed mb-8 whitespace-pre-line">
+                <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed mb-6 md:mb-8 whitespace-pre-line">
                   {member.bio}
                 </p>
 
-                <div className="space-y-3">
+                <div className="space-y-2 md:space-y-3">
                   {member.highlights.map((highlight) => (
-                    <div key={highlight} className="flex items-center gap-3 text-gray-700">
-                      <span className="text-blue-600 font-bold">✓</span>
+                    <div key={highlight} className="flex items-center gap-3 text-gray-700 text-sm sm:text-base">
+                      <span className="text-blue-600 font-bold text-lg">✓</span>
                       <span>{highlight}</span>
                     </div>
                   ))}
@@ -111,38 +111,38 @@ export default function FamilyPage() {
       </div>
 
       {/* Pets Section */}
-      <div className="py-32 px-4 bg-white">
+      <div className="py-16 md:py-32 px-3 md:px-4 bg-white">
         <div className="container mx-auto max-w-7xl">
-          <h2 className="text-4xl font-black text-slate-900 mb-4 text-center">우리 가족의 일원</h2>
-          <p className="text-xl text-gray-600 text-center mb-16 max-w-2xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 mb-3 md:mb-4 text-center">우리 가족의 일원</h2>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 text-center mb-12 md:mb-16 max-w-2xl mx-auto">
             어렸을 때부터 함께 자란 우리 고양이들. 태환이가 농장에서 데려온 아이들로, 독수리에게 잡혀 먹을 뻔했지만 우리 집에서 건강하게 자라고 있습니다.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="bg-gradient-to-br from-orange-100 to-pink-100 rounded-2xl p-8 hover:shadow-2xl transition">
-              <div className="aspect-square rounded-xl overflow-hidden mb-6 bg-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
+            <div className="bg-gradient-to-br from-orange-100 to-pink-100 rounded-2xl p-6 md:p-8 hover:shadow-2xl transition">
+              <div className="aspect-square rounded-xl overflow-hidden mb-4 md:mb-6 bg-gray-200">
                 <img
                   src="/images/cats/cat1.jpg"
                   alt="하루"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">하루 🐱</h3>
-              <p className="text-gray-700">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 mb-2">하루 🐱</h3>
+              <p className="text-sm sm:text-base text-gray-700">
                 어렸을 때부터 우리와 함께한 사랑스러운 가족 일원입니다. 따뜻한 성격으로 모두의 마음을 녹입니다.
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl p-8 hover:shadow-2xl transition">
-              <div className="aspect-square rounded-xl overflow-hidden mb-6 bg-gray-200">
+            <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl p-6 md:p-8 hover:shadow-2xl transition">
+              <div className="aspect-square rounded-xl overflow-hidden mb-4 md:mb-6 bg-gray-200">
                 <img
                   src="/images/cats/cat2.jpg"
                   alt="이틀이"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">이틀이 🐈</h3>
-              <p className="text-gray-700">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 mb-2">이틀이 🐈</h3>
+              <p className="text-sm sm:text-base text-gray-700">
                 활발하고 장난스러운 성격으로 우리에게 매일 행복을 선사합니다. 큰아들 태환이의 특별한 친구입니다.
               </p>
             </div>
@@ -151,21 +151,21 @@ export default function FamilyPage() {
       </div>
 
       {/* Values Section */}
-      <div className="py-32 px-4 bg-slate-50">
+      <div className="py-16 md:py-32 px-3 md:px-4 bg-slate-50">
         <div className="container mx-auto max-w-7xl">
-          <h2 className="text-4xl font-black text-slate-900 mb-16 text-center">우리가 함께하는 방식</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 mb-12 md:mb-16 text-center">우리가 함께하는 방식</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {[
               { emoji: '🤝', title: '함께 만드는 공간', desc: '모든 가족 구성원이 직접 이야기를 작성하고 추억을 기록할 수 있는 참여형 구조로 설계되었습니다.' },
               { emoji: '📖', title: '기록의 연속성', desc: '과거의 추억(어린 시절 사진)부터 현재의 일상(사업, 대학 생활)까지 연결되는 시간의 흐름을 담습니다.' },
               { emoji: '💝', title: '따뜻한 소통', desc: '가족 모두가 서로를 격려하고 응원하는 문화 속에서 각자의 성장을 나누고 기념합니다.' },
               { emoji: '🚀', title: '미래지향적 성장', desc: '개인의 도전과 가족의 안정이 어우러져 함께 나아갈 수 있는 미래를 그립니다.' }
             ].map((value) => (
-              <div key={value.title} className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
-                <div className="text-5xl mb-4">{value.emoji}</div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">{value.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{value.desc}</p>
+              <div key={value.title} className="bg-white p-4 md:p-8 rounded-xl shadow-lg hover:shadow-xl transition">
+                <div className="text-4xl md:text-5xl mb-3 md:mb-4">{value.emoji}</div>
+                <h3 className="text-base md:text-xl font-bold text-slate-900 mb-2 md:mb-3">{value.title}</h3>
+                <p className="text-xs sm:text-sm md:text-sm text-gray-600 leading-relaxed">{value.desc}</p>
               </div>
             ))}
           </div>
@@ -173,21 +173,21 @@ export default function FamilyPage() {
       </div>
 
       {/* CTA */}
-      <div className="py-32 px-4">
+      <div className="py-16 md:py-32 px-3 md:px-4">
         <div className="container mx-auto max-w-7xl text-center">
-          <h2 className="text-4xl font-black text-slate-900 mb-6">우리의 포트폴리오를 살펴보세요</h2>
-          <p className="text-xl text-gray-600 mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 mb-4 md:mb-6">우리의 포트폴리오를 살펴보세요</h2>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 mb-8 md:mb-12">
             30년 교육 전문가의 역량과 가족의 혁신적인 사업이 담긴 프로젝트들을 만나보세요.
           </p>
-          <a href="/portfolio" className="inline-block bg-slate-900 text-white px-12 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:scale-105 transition transform duration-300">
+          <a href="/portfolio" className="inline-block bg-slate-900 text-white px-8 md:px-12 py-3 md:py-4 rounded-lg font-bold text-sm md:text-base lg:text-lg hover:shadow-2xl hover:scale-105 transition transform duration-300">
             포트폴리오 보기
           </a>
         </div>
       </div>
 
       {/* Navigation */}
-      <div className="py-8 px-4 bg-slate-50 text-center">
-        <a href="/" className="text-blue-600 font-semibold hover:text-blue-800 transition">
+      <div className="py-6 md:py-8 px-3 md:px-4 bg-slate-50 text-center">
+        <a href="/" className="text-blue-600 font-semibold hover:text-blue-800 transition text-sm md:text-base">
           ← 홈으로 돌아가기
         </a>
       </div>

@@ -112,50 +112,50 @@ function WriteContent() {
 
   if (pageLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center">
-        <p className="text-lg text-gray-600">로딩 중...</p>
+      <div className="min-h-screen bg-gray-50 py-8 md:py-12 px-3 md:px-4 flex items-center justify-center">
+        <p className="text-sm md:text-base lg:text-lg text-gray-600">로딩 중...</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-gray-50 py-6 md:py-12 px-3 md:px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="mb-8">
-          <Link href="/timeline" className="text-blue-600 hover:text-blue-800 font-semibold">
+        <div className="mb-6 md:mb-8">
+          <Link href="/timeline" className="text-blue-600 hover:text-blue-800 font-semibold text-sm md:text-base">
             ← 타임라인으로 돌아가기
           </Link>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-4xl font-bold mb-2 text-slate-900">
+        <div className="bg-white rounded-lg shadow-lg p-4 md:p-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-slate-900">
             {isEditing ? '✏️ 이야기 수정' : '✏️ 새로운 이야기'}
           </h1>
-          <p className="text-gray-600 mb-8">
+          <p className="text-sm sm:text-base text-gray-600 mb-6 md:mb-8">
             {isEditing ? '기존 이야기를 수정하세요' : '가족의 추억과 일상을 공유하세요'}
           </p>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
+            <div className="mb-6 p-3 md:p-4 bg-red-50 text-red-700 rounded-lg border border-red-200 text-sm md:text-base">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-lg border border-green-200">
+            <div className="mb-6 p-3 md:p-4 bg-green-50 text-green-700 rounded-lg border border-green-200 text-sm md:text-base">
               ✅ 글이 저장되었습니다! 타임라인으로 이동 중...
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                 카테고리
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
               >
                 <option value="daily">✅ 할일</option>
                 <option value="university">📚 대학생활</option>
@@ -165,7 +165,7 @@ function WriteContent() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                 제목
               </label>
               <input
@@ -173,35 +173,35 @@ function WriteContent() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="제목을 입력하세요"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                 내용
               </label>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="이야기를 입력하세요"
-                rows={10}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={8}
+                className="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
               />
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50"
+                className="flex-1 bg-blue-600 text-white py-2 md:py-3 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50 text-sm md:text-base"
               >
                 {loading ? '저장 중...' : isEditing ? '수정 저장' : '💾 저장'}
               </button>
               <Link href="/timeline" className="flex-1">
                 <button
                   type="button"
-                  className="w-full bg-gray-300 text-gray-800 py-3 rounded-lg font-bold hover:bg-gray-400 transition"
+                  className="w-full bg-gray-300 text-gray-800 py-2 md:py-3 rounded-lg font-bold hover:bg-gray-400 transition text-sm md:text-base"
                 >
                   취소
                 </button>
